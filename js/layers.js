@@ -37,14 +37,21 @@ addLayer("s", {
     12: {
         description(){return "Starting points boost point gain. Currently: x"+format(this.effect())},
         cost: new Decimal(2),
-        effect(){return player.s.points.add(1).log10().add(1)}
+        effect(){
+          if(hasUpgrade(this.layer,14))return player.s.points.root(3).add(1)
+          return player.s.points.add(1).log10().add(1)}
     },
     13: {
         description(){return "Each upgrade multiplies points by 1.5. Currently: x"+format(this.effect())},
         cost: new Decimal(4),
         effect(){return Decimal.pow(1.5,player.s.upgrades.length)}
     },
-},
+    14: {
+        description(){return "The second upgrade's formula is better."},
+        cost: new Decimal(30),
+        unlocked(){return hasMilestone("u",4)},
+    },
+},passiveGeneration(){return hasMilestone("m",1)?1/6:0}
 })
 addLayer("m", {
     name: "minutes", // This is optional, only used in a few places, If absent it just uses the layer id.
@@ -57,7 +64,7 @@ addLayer("m", {
     color: "#6aaa02",
     requires(){let r= new Decimal(6)
     return r}, // Can be a function that takes requirement increases into account
-  effect(){return player.m.points.add(1)},
+  effect(){return player.m.points.add(1).pow(hasMilestone("u",5)?0.8:1)},
   effectDescription(){return "Multiplying starting point gain by "+format(this.effect())},
     resource: "minutes", // Name of prestige currency
     baseResource: "starting points", // Name of resource prestige is based on
@@ -76,6 +83,15 @@ addLayer("m", {
         {key: "m", description: "M: Reset for minutes", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return player.timer>0&&hasMilestone("u",3)},
+  milestones: {
+    1: {
+        requirementDescription: "100 minutes",
+        effectDescription: "Gain 1000% of starting point gain on prestige every minute",
+        done() { return player.m.points.gte(100)},
+      unlocked(){return hasMilestone("u",5)},
+    },
+  },
+  
 })
 addLayer("u", {
     name: "upgrades", // This is optional, only used in a few places, If absent it just uses the layer id.
@@ -87,7 +103,7 @@ addLayer("u", {
       best: new Decimal(0)
     }},
   resource: "upgrade points",
-  effectDescription(){return "The gain formula is log10(points+1)"},
+  effectDescription(){return "The gain formula is log"+(hasMilestone("u",5)?2:hasUpgrade("u",14)?8:10)+"(points+1)"},
     color: "#69420a",
     type: "none", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
@@ -101,7 +117,7 @@ addLayer("u", {
       player.timer=Math.max(player.timer-diff,0)
     } else if(player.points.gt(0)){
       player.tab="u"
-      player.u.points=player.points.add(1).log10()
+      player.u.points=player.points.add(1).log((hasMilestone("u",5)?2:hasUpgrade("u",14)?8:10))
       if(player.u.best.lt(player.u.points))player.u.best=player.u.points
       player.points=decimalZero
       doReset("aaaaaa")
@@ -135,6 +151,18 @@ addLayer("u", {
         done() { return player.u.points.gte(3.3)},
       unlocked(){return hasMilestone("u",2)}
     },
+    4: {
+        requirementDescription: "3.9 upgrade points",
+        effectDescription: "Unlock another starting upgrade",
+        done() { return player.u.points.gte(3.9)},
+      unlocked(){return hasMilestone("u",3)}
+    },
+    5: {
+        requirementDescription: "25 upgrade points",
+        effectDescription: "Nerf the minute effect but triple upgrade point gain and unlock a minute milestone",
+        done() { return player.u.points.gte(25)},
+      unlocked(){return hasMilestone("u",4)}
+    },
 },
   upgrades: {
     11: {
@@ -157,9 +185,16 @@ addLayer("u", {
       unlocked(){return hasMilestone("u",3)},
     fullDisplay(){return this.description()+"<br><br>"+"Cost: "+format(this.cost)+" upgrade points"},
       effect(){
-        let s = player.u.best.min(100/3)
+        let s = player.u.best.min(30)
         return s
       },
+      pay(){},
+    },
+    14: {
+        description(){return "The upgrade point gain formula is slightly better"},
+        cost: new Decimal(3.4),
+      unlocked(){return hasMilestone("u",3)},
+    fullDisplay(){return this.description()+"<br><br>"+"Cost: "+format(this.cost)+" upgrade points"},
       pay(){},
     },
 },

@@ -17,6 +17,7 @@ addLayer("s", {
     exponent: 0.5, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
         mult = new Decimal(1)
+      mult=mult.mul(tmp.m.effect)
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -45,6 +46,37 @@ addLayer("s", {
     },
 },
 })
+addLayer("m", {
+    name: "minutes", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "M", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		points: new Decimal(0),
+    }},
+    color: "#6aaa02",
+    requires(){let r= new Decimal(6)
+    return r}, // Can be a function that takes requirement increases into account
+  effect(){return player.m.points.add(1)},
+  effectDescription(){return "Multiplying starting point gain by "+format(this.effect())},
+    resource: "minutes", // Name of prestige currency
+    baseResource: "starting points", // Name of resource prestige is based on
+    baseAmount() {return player.s.points}, // Get the current amount of baseResource
+    type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 1, // Prestige currency exponent
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        mult = new Decimal(1)
+        return mult
+    },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 1, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+        {key: "m", description: "M: Reset for minutes", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+    layerShown(){return player.timer>0&&hasMilestone("u",3)},
+})
 addLayer("u", {
     name: "upgrades", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "U", // This appears on the layer's node. Default is the id with the first letter capitalized
@@ -63,20 +95,25 @@ addLayer("u", {
     layerShown(){return player.timer==0},
   update(diff){
     if(player.timer>0){
+      diff=new Decimal(diff)
+      if(hasUpgrade("u",13))diff=diff.mul(Decimal.sub(1,Decimal.div(upgradeEffect("u",13),100)))
+      diff=diff.toNumber()
       player.timer=Math.max(player.timer-diff,0)
     } else if(player.points.gt(0)){
+      player.tab="u"
       player.u.points=player.points.add(1).log10()
       if(player.u.best.lt(player.u.points))player.u.best=player.u.points
       player.points=decimalZero
       doReset("aaaaaa")
       if(hasUpgrade("u",12)){player.s.upgrades.push(11)}
     }
+    if(hasMilestone("u",3)&&!hasUpgrade("s",13))player.s.upgrades.push(13)
   },
   clickables:{
     11:{
       display(){return "Start the game"},
       canClick(){return player.timer==0},
-      onClick(){player.timer=getTimer()},
+      onClick(){player.timer=getTimer();player.tab="s"},
     }
   },
   milestones: {
@@ -91,6 +128,12 @@ addLayer("u", {
         effectDescription: "Base point gain is increased by your best upgrade points",
         done() { return player.u.points.gte(2)},
       unlocked(){return hasMilestone("u",1)}
+    },
+    3: {
+        requirementDescription: "3.3 upgrade points",
+        effectDescription: "Unlock the ability to see a new layer during the 30 seconds of playing and always have the 3rd starting upgrade. Upgrade upgrades no longer spend your upgrade points.",
+        done() { return player.u.points.gte(3.3)},
+      unlocked(){return hasMilestone("u",2)}
     },
 },
   upgrades: {
@@ -107,6 +150,17 @@ addLayer("u", {
       unlocked(){return hasMilestone("u",1)},
     fullDisplay(){return this.description()+"<br><br>"+"Cost: "+format(this.cost)+" upgrade points"},
       onPurchase(){player.s.upgrades.push(11)}
+    },
+    13: {
+        description(){return "Time runs slower based on your upgrade points. Currently: "+format(this.effect(),4)+"%"},
+        cost: new Decimal(3.33),
+      unlocked(){return hasMilestone("u",3)},
+    fullDisplay(){return this.description()+"<br><br>"+"Cost: "+format(this.cost)+" upgrade points"},
+      effect(){
+        let s = player.u.best.min(100/3)
+        return s
+      },
+      pay(){},
     },
 },
   tabFormat:{

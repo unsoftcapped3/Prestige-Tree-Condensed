@@ -117,7 +117,7 @@ addLayer("u", {
       player.timer=Math.max(player.timer-diff,0)
     } else if(player.points.gt(0)){
       player.tab="u"
-      player.u.points=player.points.add(1).log((hasMilestone("u",5)?2:hasUpgrade("u",14)?8:10))
+      player.u.points=player.points.add(1).log((hasMilestone("u",5)?2:hasUpgrade("u",14)?8:10)).min(hasMilestone("u",5)?25:Infinity)
       if(player.u.best.lt(player.u.points))player.u.best=player.u.points
       player.points=decimalZero
       doReset("aaaaaa")

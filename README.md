@@ -1,2 +1,2 @@
-# 30-second-tree
-TMT mod, you can only play for 30 seconds
+# PT:RC
+Prestige Tree Rewritten but it's condensed

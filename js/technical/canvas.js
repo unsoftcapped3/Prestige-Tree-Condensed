@@ -2,11 +2,13 @@ var canvas;
 var ctx;
 
 window.addEventListener("resize", (_=>resizeCanvas()));
+window.addEventListener('wheel', (_=>resizeCanvas()));
 
 function retrieveCanvasData() {
 	let treeCanv = document.getElementById("treeCanvas")
 	let treeTab = document.getElementById("treeTab")
 	if (treeCanv===undefined||treeCanv===null) return false;
+	if (treeTab===undefined||treeTab===null) return false;
 	canvas = treeCanv;
 	ctx = canvas.getContext("2d");
 	return true;
@@ -16,12 +18,23 @@ function resizeCanvas() {
 	if (!retrieveCanvasData()) return
 	canvas.width = 0;
     canvas.height = 0;
-	canvas.width  = window.innerWidth;
+	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-		drawTree();
+	drawTree();
 }
 
-
+var colors = {
+	default: {
+		1: "#ffffff",
+		2: "#bfbfbf",
+		3: "#7f7f7f",
+	},
+	aqua: {
+		1: "#bfdfff",
+		2: "#8fa7bf",
+		3: "#5f6f7f",
+	},
+}
 var colors_theme
 
 function drawTree() {
@@ -31,55 +44,38 @@ function drawTree() {
 		if (tmp[layer].layerShown == true && tmp[layer].branches){
 			for (branch in tmp[layer].branches)
 				{
-					drawTreeBranch(layer, tmp[layer].branches[branch])
+					drawTreeBranch(layer, tmp[layer].branches[branch]);
 				}
 		}
-		drawComponentBranches(layer, tmp[layer].upgrades, "upgrade-")
-		drawComponentBranches(layer, tmp[layer].buyables, "buyable-")
-		drawComponentBranches(layer, tmp[layer].clickables, "clickable-")
-
 	}
+	needCanvasUpdate = false;
 }
 
-function drawComponentBranches(layer, data, prefix) {
-	for(id in data) {
-		if (data[id].branches) {
-			for (branch in data[id].branches)
-			{
-				drawTreeBranch(id, data[id].branches[branch], prefix + layer + "-")
-			}
-
-		}
-	}
-
-}
-
-function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimensions & adjusted slightly
+function drawTreeBranch(num1, data) { // taken from Antimatter Dimensions & adjusted slightly
 	let num2 = data
 	let color_id = 1
-	let width = 15
+
 	if (Array.isArray(data)){
 		num2 = data[0]
 		color_id = data[1]
-		width = data[2] || width
-	}
+	} 
 
-	if(typeof(color_id) == "number")
-		color_id = colors_theme[color_id]
-	if (prefix) {
-		num1 = prefix + num1
-		num2 = prefix + num2
-	}
-	if (document.getElementById(num1) == null || document.getElementById(num2) == null)
+	if (typeof color_id == "number") color_id = colors_theme[color_id]
+
+	let el1 = document.getElementById(num1);
+	let el2 = document.getElementById(num2);
+	let tab = document.body;
+
+	if (el1 == null || el2 == null)
 		return
 
-	let start = document.getElementById(num1).getBoundingClientRect();
-    let end = document.getElementById(num2).getBoundingClientRect();
-    let x1 = start.left + (start.width / 2) + document.body.scrollLeft;
-    let y1 = start.top + (start.height / 2) + document.body.scrollTop;
-    let x2 = end.left + (end.width / 2) + document.body.scrollLeft;
-    let y2 = end.top + (end.height / 2) + document.body.scrollTop;
-    ctx.lineWidth = width;
+	let start = el1.getBoundingClientRect();
+    let end = el2.getBoundingClientRect();
+    let x1 = start.left + (start.width / 2) + tab.scrollLeft;
+    let y1 = start.top + (start.height / 2) + tab.scrollTop;
+    let x2 = end.left + (end.width / 2) + tab.scrollLeft;
+    let y2 = end.top + (end.height / 2) + tab.scrollTop;
+    ctx.lineWidth = 15;
     ctx.beginPath();
     ctx.strokeStyle = color_id
     ctx.moveTo(x1, y1);

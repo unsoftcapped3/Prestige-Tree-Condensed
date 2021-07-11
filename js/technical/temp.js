@@ -1,17 +1,11 @@
 var tmp = {}
-var temp = tmp // Proxy for tmp
-var funcs = {}
 var NaNalert = false;
 
 // Tmp will not call these
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
-	"buy", "buyMax", "respec", "onPress", "onClick", "onHold", "masterButtonPress",
-	"sellOne", "sellAll", "pay", "actualCostFunction", "actualEffectFunction",
-	"effectDescription", "display", "fullDisplay", "effectDisplay", "rewardDisplay",
-	"tabFormat", "content",
-	"onComplete", "onPurchase", "onEnter", "onExit", "done",
-	"getUnlocked", "getStyle", "getCanClick", "getTitle", "getDisplay"
+	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress",
+	"sellOne", "sellAll",
 ]
 
 var noCall = doNotCallTheseFunctionsEveryTick
@@ -19,19 +13,16 @@ for (item in noCall) {
 	activeFunctions.push(noCall[item])
 }
 
-// Add the names of classes to traverse
-var traversableClasses = []
-
 function setupTemp() {
 	tmp = {}
+	tmp.helpTab = NaN;
+	tmp.helpData = {};
+	tmp.nerdMode = false
 	tmp.pointGen = {}
-	tmp.backgroundStyle = {}
+	tmp.row1to6spd = new Decimal(1)
 	tmp.displayThings = []
-	tmp.scrolled = 0
-	tmp.gameEnded = false
-	funcs = {}
-	
-	setupTempData(layers, tmp, funcs)
+
+	setupTempData(layers, tmp)
 	for (layer in layers){
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
@@ -39,26 +30,13 @@ function setupTemp() {
 		tmp[layer].canReset = {}
 		tmp[layer].notify = {}
 		tmp[layer].prestigeNotify = {}
-		tmp[layer].computedNodeStyle = []
-		setupBuyables(layer)
-		tmp[layer].trueGlowColor = []
+		tmp[layer].prestigeButtonText = {}
+		setupBarStyles(layer)
 	}
-
-	tmp.other = {
-		lastPoints: player.points || decimalZero,
-		oomps: decimalZero,
-		screenWidth: 0,
-		screenHeight: 0,
-    }
-
-	updateWidth()
-
-	temp = tmp
+	if (typeof help_data != "undefined") setupTempData(help_data, tmp.helpData);
 }
 
-const boolNames = ["unlocked", "deactivated"]
-
-function setupTempData(layerData, tmpData, funcsData) {
+function setupTempData(layerData, tmpData) {
 	for (item in layerData){
 		if (layerData[item] == null) {
 			tmpData[item] = null
@@ -67,113 +45,141 @@ function setupTempData(layerData, tmpData, funcsData) {
 			tmpData[item] = layerData[item]
 		else if (Array.isArray(layerData[item])) {
 			tmpData[item] = []
-			funcsData[item] = []
-			setupTempData(layerData[item], tmpData[item], funcsData[item])
+			setupTempData(layerData[item], tmpData[item])
 		}
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
 			tmpData[item] = {}
-			funcsData[item] = []
-			setupTempData(layerData[item], tmpData[item], funcsData[item])
-		}
-		else if ((!!layerData[item]) && (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)) {
-			tmpData[item] = new layerData[item].constructor()
-			funcsData[item] = new layerData[item].constructor()
+			setupTempData(layerData[item], tmpData[item])
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
-			funcsData[item] = layerData[item]
-			if (boolNames.includes(item))
-				tmpData[item] = false
-			else
-				tmpData[item] = decimalOne // The safest thing to put probably?
+			tmpData[item] = new Decimal(1) // Safest thing to put probably?
 		} else {
 			tmpData[item] = layerData[item]
 		}
 	}	
 }
 
-
 function updateTemp() {
 	if (tmp === undefined)
 		setupTemp()
 
-	updateTempData(layers, tmp, funcs)
+	for (layer in layers) {updateTempData(layers[layer], tmp[layer], layer)}
 
 	for (layer in layers){
 		tmp[layer].resetGain = getResetGain(layer)
 		tmp[layer].nextAt = getNextAt(layer)
 		tmp[layer].nextAtDisp = getNextAt(layer, true)
 		tmp[layer].canReset = canReset(layer)
-		tmp[layer].trueGlowColor = tmp[layer].glowColor
 		tmp[layer].notify = shouldNotify(layer)
 		tmp[layer].prestigeNotify = prestigeNotify(layer)
-		if (tmp[layer].passiveGeneration === true) tmp[layer].passiveGeneration = 1 // new Decimal(true) = decimalZero
-
+		tmp[layer].prestigeButtonText = prestigeButtonText(layer)
+		constructBarStyles(layer)
 	}
 
 	tmp.pointGen = getPointGen()
-	tmp.backgroundStyle = readData(backgroundStyle)
-
+	tmp.row1to6spd = getRow1to6Speed()
 	tmp.displayThings = []
 	for (thing in displayThings){
 		let text = displayThings[thing]
 		if (isFunction(text)) text = text()
 		tmp.displayThings.push(text) 
 	}
+	
+	if (typeof help_data != "undefined" && player.tab=='help') {
+		updateTempData(help_data, tmp.helpData, "help");
+	}
 }
 
-function updateTempData(layerData, tmpData, funcsData, useThis) {
-	for (item in funcsData){
+function updateTempData(layerData, tmpData, layer, pre, pre2, isArr) {
+	
+	for (item in layerData){
+		if ((item.toLowerCase().includes("display") || (item.toLowerCase().includes("tabformat")&&layer!="tree-tab") || item.toLowerCase().includes("description") || (item == "unlocked" && pre2 != "upgrades")) && player.tab != layer) continue;
 		if (Array.isArray(layerData[item])) {
-			if (item !== "tabFormat" && item !== "content") // These are only updated when needed
-				updateTempData(layerData[item], tmpData[item], funcsData[item], useThis)
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, true)
 		}
-		else if ((!!layerData[item]) && (layerData[item].constructor === Object) || (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)){
-			updateTempData(layerData[item], tmpData[item], funcsData[item], useThis)
+		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
+			updateTempData(layerData[item], tmpData[item], layer, item, pre, isArr)
 		}
-		else if (isFunction(layerData[item]) && !isFunction(tmpData[item])){
-			let value
+		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
+			let value = layerData[item]()
+			if (value !== value || value === decimalNaN){
+				if (NaNalert === true || confirm ("Invalid value found in tmp, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
+					NaNalert = true
+					value = (value !== value ? 0 : decimalZero)
+				}
+				else {
+					clearInterval(interval);
+					player.autosave = false;
+					NaNalert = true;
+				}
+			}
 
-			if (useThis !== undefined) value = layerData[item].bind(useThis)()
-			else value = layerData[item]()
-			Vue.set(tmpData, item, value)
+
+			if (isArr) Vue.set(tmpData, item, value); else tmpData[item] = value
 		}
 	}	
 }
 
 function updateChallengeTemp(layer)
 {
-	updateTempData(layers[layer].challenges, tmp[layer].challenges, funcs[layer].challenges)
+	updateTempData(layers[layer].challenges, tmp[layer].challenges)
 }
-
 
 function updateBuyableTemp(layer)
 {
-	updateTempData(layers[layer].buyables, tmp[layer].buyables, funcs[layer].buyables)
+	updateTempData(layers[layer].buyables, tmp[layer].buyables)
 }
 
 function updateClickableTemp(layer)
 {
-	updateTempData(layers[layer].clickables, tmp[layer].clickables, funcs[layer].clickables)
+	updateTempData(layers[layer].clickables, tmp[layer].clickables)
 }
 
-function setupBuyables(layer) {
-	for (id in layers[layer].buyables) {
-		if (isPlainObject(layers[layer].buyables[id])) {
-			let b = layers[layer].buyables[id]
-			b.actualCostFunction = b.cost
-			b.cost = function(x) {
-				x = (x === undefined ? player[this.layer].buyables[this.id] : x)
-				return layers[this.layer].buyables[this.id].actualCostFunction(x)
-			}
-			b.actualEffectFunction = b.effect
-			b.effect = function(x) {
-				x = (x === undefined ? player[this.layer].buyables[this.id] : x)
-				return layers[this.layer].buyables[this.id].actualEffectFunction(x)
+
+var DIR_MARGINS = ["margin-bottom", "margin-top", "margin-right", "margin-left"]
+
+function constructBarStyles(layer){
+	if (layers[layer].bars === undefined)
+		return
+	for (id in layers[layer].bars){
+		if (id !== "layer") {
+			let bar = tmp[layer].bars[id]
+			if (bar.progress instanceof Decimal)
+				bar.progress = bar.progress.toNumber()
+			bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
+
+			bar.dims = {'width': bar.width + "px", 'height': bar.height + "px"}
+			let dir = bar.direction
+			bar.fillDims = {'width': (bar.width + 0.5) + "px", 'height': (bar.height + 0.5)  + "px"}
+			if (dir !== undefined)
+			{
+				bar.fillDims['clip-path'] = 'inset(0% 50% 0% 0%)'
+				if(dir == UP){
+					bar.fillDims['clip-path'] = 'inset(' + bar.progress + '% 0% 0% 0%)'
+				}
+				else if(dir == DOWN){
+					bar.fillDims['clip-path'] = 'inset(0% 0% ' + bar.progress + '% 0%)'
+				}
+				else if(dir == RIGHT){
+					bar.fillDims['clip-path'] = 'inset(0% ' + bar.progress + '% 0% 0%)'
+				}
+				else if(dir == LEFT){
+					bar.fillDims['clip-path'] = 'inset(0% 0% 0% ' + bar.progress + '%)'
+				}
+
 			}
 		}
+
 	}
 }
 
-function checkDecimalNaN(x) {
-	return (x instanceof Decimal) && !x.eq(x)
+function setupBarStyles(layer){
+	if (layers[layer].bars === undefined)
+		return
+	for (id in layers[layer].bars){
+		let bar = tmp[layer].bars[id]
+		bar.dims = {}
+		let dir = bar.direction
+		bar.fillDims = {}
+	}
 }

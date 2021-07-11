@@ -1,8 +1,6 @@
 // treeLayout will override the default tree's layout if used
 var layoutInfo = {
     startTab: "c",
-    startNavTab: "tree-tab",
-
 	showTree: true,
 
     //treeLayout: ""
@@ -21,14 +19,13 @@ addNode("spook", {
 // A "ghost" layer which offsets f in the tree
 addNode("g", {
     symbol: "TH",
-    branches: [["c", "red", 4]],
+    branches: ["c"],
     color: '#6d3678',
     layerShown: true,
     canClick() {return player.points.gte(10)},
     tooltip: "Thanos your points",
     tooltipLocked: "Thanos your points",
-    onClick() {player.points = player.points.div(2)
-    console.log(this.layer)}
+    onClick() {player.points = player.points.div(2)}
 
 }, 
 )
@@ -38,18 +35,14 @@ addNode("g", {
 addNode("h", {
     branches: ["g"],
     layerShown: true,
-    tooltip() {return "Restore your points to " + player.c.otherThingy},
-    tooltipLocked() {return "Restore your points to " + player.c.otherThingy},
-    row: "side",
-    canClick() {return player.points.lt(player.c.otherThingy)},
-    onClick() {player.points = new Decimal(player.c.otherThingy)}
+    tooltip: "Restore your points to 10",
+    tooltipLocked: "Restore your points to 10",
+
+    canClick() {return player.points.lt(10)},
+    onClick() {player.points = new Decimal(10)}
 }, 
 )
 
 addLayer("tree-tab", {
-    tabFormat: [["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]],
-    previousTab: "",
-    leftTab: true,
-                style() {return  {'background-color': '#222222'}},
-
+    tabFormat: [["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
 })

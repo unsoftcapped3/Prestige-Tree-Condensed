@@ -1,11 +1,11 @@
 let modInfo = {
-	name: "Prestige Tree Rewritten",
-	id: "ptr",
-	author: "Jacorb",
+	name: "Prestige Tree Condensed",
+	id: "ptrc",
+	author: "upvoid",
 	pointsName: "points",
-	discordName: "PT Rewritten Server",
-	discordLink: "https://discord.gg/TFCHJJT",
-	changelogLink: "https://github.com/Jacorb90/Prestige-Tree/blob/master/changelog.md",
+	discordName: "",
+	discordLink: "",
+	changelogLink: "",
     offlineLimit: 1,  // In hours
     initialStartPoints: new Decimal(10), // Used for hard resets and new players
 	endgame: new Decimal("e3.14e16"),
@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.3",
-	patch: 1,
-	name: "The Expansion Update",
+	num: "0.2",
+	patch: 0,
+	name: "Row 3, part 1",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -76,7 +76,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: 1e120 points"
+  "Endgame: 1e300 points, DO NOT PICK A SECOND ROW 3 LAYER YET"
 ]
 
 // Determines when the game "ends"

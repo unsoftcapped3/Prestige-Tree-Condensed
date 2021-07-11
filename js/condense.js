@@ -24,10 +24,12 @@ addLayer("condensers", {
 			let b11 = player.condensers.buyables[11]
       let b12 = player.condensers.buyables[12]
       let b13 = player.condensers.buyables[13]
+      let b21 = player.condensers.buyables[21]
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
       if(hasMilestone("b",2))player.condensers.buyables[11] = b11
-      if(hasUpgrade("b",12))player.condensers.buyables[12] = b12
+      if(hasUpgrade("b",12)||hasMilestone("s",1))player.condensers.buyables[12] = b12
       if(hasMilestone("g",2))player.condensers.buyables[13] = b13
+      if(layers[resettingLayer].row < this.row+2)player.condensers.buyables[21] = b21
 		},
 		startData() { return {
 			unlocked: true,
@@ -61,7 +63,8 @@ addLayer("condensers", {
         effect(){
           let e= player.p.points.add(1).log10().add(1).pow(player.condensers.buyables[12])
           return e
-        }
+        },
+      unlocked(){return player.b.unlocked||player.g.unlocked}
     },
     13: {
         cost() { return new Decimal(1e6).mul(Decimal.pow(8,player.condensers.buyables[13].pow(1.5))) },
@@ -73,8 +76,24 @@ addLayer("condensers", {
         },
         effect(){
           let e= player.g.power.add(1).log10().add(1).pow(player.condensers.buyables[13])
+          if(hasMilestone("e",3))e=e.pow(1.25)
           return e
-        }
+        },
+      unlocked(){return player.g.unlocked}
+    },
+    21: {
+        cost() { return new Decimal(1e6).mul(Decimal.pow(7,player.condensers.buyables[21].pow(1.7))) },
+        display() { return "Condense your time energy for "+format(this.cost())+" time energy. Your condensers are multiplying time energy gain and cap by "+format(this.effect()) },
+        canAfford() { return player.t.energy.gte(this.cost()) },
+        buy() {
+            player.t.energy = player.t.energy.sub(this.cost())
+            setBuyableAmount(this.layer, this.id, player.condensers.buyables[21].add(1))
+        },
+        effect(){
+          let e= player.t.energy.add(1).log10().add(1).pow(player.condensers.buyables[21])
+          return e
+        },
+      unlocked(){return player.t.unlocked}
     },
   },tooltip:"Condensers",
 tabFormat: {
@@ -122,6 +141,11 @@ addLayer("a2", {
                 name: "Counting with ones",
                 done() { return player.points.gte(1.11e111) },
                 tooltip: "Have 1.11e111 points. Reward: Point gain is multiplied by 1.1e11.",
+            },
+          21: {
+                name: "Trolling",
+                done() { return player.condensers.buyables[13].gte(19) },
+                tooltip: "Get 19 generator power condensers. Reward: Each generator power condenser and time energy condenser adds 1 to the booster base",
             },
 
 		},

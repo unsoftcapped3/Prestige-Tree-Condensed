@@ -316,6 +316,7 @@ addLayer("b", {
 			if (player.s.unlocked) base = base.plus(buyableEffect("s", 12));
 			if (hasUpgrade("t", 25)) base = base.plus(upgradeEffect("t", 25));
       if(hasAchievement("a2",13))base=base.add(0.69)
+      if(hasAchievement("a2",21))base=base.add(player.condensers.buyables[13].add(player.condensers.buyables[21]))
 			return base;
 		},
 		effectBase() {
@@ -817,7 +818,7 @@ addLayer("g", {
 			25: {
 				title: "I Need More IV",
 				description: "Prestige Points boost Generator Power gain.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e47526":1e14) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e47526":1e28) },
 				currencyDisplayName: "generator power",
                 currencyInternalName: "power",
                 currencyLayer: "g",
@@ -924,7 +925,7 @@ addLayer("t", {
         baseResource: "points", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
         type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-        exponent() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?new Decimal(1.4):new Decimal(1.85) }, // Prestige currency exponent
+        exponent() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?new Decimal(1.4):new Decimal(1.8) }, // Prestige currency exponent
 		base() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?new Decimal(10):new Decimal(1e15) },
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
@@ -941,12 +942,14 @@ addLayer("t", {
 			if (hasUpgrade("t", 22)) mult = mult.times(upgradeEffect("t", 22));
 			if (player.h.unlocked) mult = mult.times(tmp.h.effect);
 			if (player.o.unlocked) mult = mult.times(tmp.o.solEnEff2);
+      mult = mult.times(buyableEffect("condensers",21))
 			return mult;
 		},
 		enGainMult() {
 			let mult = new Decimal(1);
 			if (hasUpgrade("t", 22)) mult = mult.times(upgradeEffect("t", 22));
 			if (player.h.unlocked) mult = mult.times(tmp.h.effect);
+      mult = mult.times(buyableEffect("condensers",21))
 			return mult;
 		},
 		effBaseMult() {
@@ -1050,7 +1053,7 @@ addLayer("t", {
 			11: {
 				title: "Pseudo-Boost",
 				description: "Non-extra Time Capsules add to the Booster base.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?750:2) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?750:3) },
 				unlocked() { return player.t.unlocked },
 				effect() { 
 					return player.t.points.pow(0.9).add(0.5).plus(hasUpgrade("t", 13)?upgradeEffect("t", 13):0).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:1);
@@ -1064,42 +1067,42 @@ addLayer("t", {
 			},
 			12: {
 				title: "Limit Stretcher",
-				description: "Time Energy cap starts later based on Boosters, and +1 Extra Time Capsule.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e262:([5e4,2e5,2.5e6][player[this.layer].unlockOrder||0])) },
+				description: "Time Energy cap starts later based on Boosters, and +2 Extra Time Capsules.",
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e262:([25000,2e5,2.5e6][player[this.layer].unlockOrder||0])) },
 				currencyDisplayName: "time energy",
                 currencyInternalName: "energy",
                 currencyLayer: "t",
 				unlocked() { return player.t.best.gte(2) },
 				effect() { 
-					return player.b.points.pow(0.95).add(1)
+					return player.b.points.add(1)
 				},
 				effectDisplay() { return format(tmp.t.upgrades[12].effect)+"x" },
-				formula: "x^0.95+1",
+				formula: "x+1",
 			},
 			13: {
 				title: "Pseudo-Pseudo-Boost",
-				description: "Extra Time Capsules add to the <b>Pseudo-Boost</b>'s effect.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e265:([3e6,3e7,3e8][player[this.layer].unlockOrder||0])) },
+				description: "Time Capsules add to the <b>Pseudo-Boost</b>'s effect.",
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e265:([1.5e6,3e7,3e8][player[this.layer].unlockOrder||0])) },
 				currencyDisplayName: "time energy",
                 currencyInternalName: "energy",
                 currencyLayer: "t",
 				unlocked() { return hasUpgrade("t", 12) },
 				effect() { 
-					return player.t.buyables[11].add(tmp.t.freeExtraTimeCapsules).pow(0.95);
+					return player.t.buyables[11].add(tmp.t.freeExtraTimeCapsules);
 				},
 				effectDisplay() { return "+"+format(tmp.t.upgrades[13].effect) },
-				formula: "x^0.95",
+				formula: "x",
 			},
 			14: {
 				title: "More Time",
-				description: "The Time Energy effect is raised to the power of 1.3.",
+				description: "The Time Energy effect is raised to the power of 1.3, and unlock time energy condensers.",
 				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?760:(player.t.unlockOrder>=2?5:4)) },
 				unlocked() { return hasUpgrade("t", 13) },
 			},
 			15: {
 				title: "Time Potency",
 				description: "Time Energy affects Generator Power gain.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e267:([1.25e7,(player.s.unlocked?3e8:6e7),1.5e9][player[this.layer].unlockOrder||0])) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1e267:([2e8,(player.s.unlocked?3e8:6e7),1.5e9][player[this.layer].unlockOrder||0])) },
 				currencyDisplayName: "time energy",
                 currencyInternalName: "energy",
                 currencyLayer: "t",
@@ -1225,7 +1228,7 @@ addLayer("t", {
 		},
 		freeExtraTimeCapsules() {
 			let free = new Decimal(0);
-			if (hasUpgrade("t", 12)) free = free.plus(1);
+			if (hasUpgrade("t", 12)) free = free.plus(2);
 			if (hasUpgrade("t", 24)) free = free.plus(tmp.t.enEff2);
 			if (hasUpgrade("q", 22)) free = free.plus(upgradeEffect("q", 22));
 			return free;
@@ -1281,23 +1284,23 @@ addLayer("t", {
 		},
 		milestones: {
 			0: {
-				requirementDescription: "2 Time Capsules",
-				done() { return player.t.best.gte(2) || hasAchievement("a", 71) },
+				requirementDescription: "1 Time Capsules",
+				done() { return player.t.best.gte(1) || hasAchievement("a", 71) },
 				effectDescription: "Keep Booster/Generator milestones on reset.",
 			},
 			1: {
-				requirementDescription: "3 Time Capsules",
-				done() { return player.t.best.gte(3) || hasAchievement("a", 41) || hasAchievement("a", 71) },
+				requirementDescription: "2 Time Capsules",
+				done() { return player.t.best.gte(2) || hasAchievement("a", 41) || hasAchievement("a", 71) },
 				effectDescription: "Keep Prestige Upgrades on reset.",
 			},
 			2: {
-				requirementDescription: "4 Time Capsules",
-				done() { return player.t.best.gte(4) || hasAchievement("a", 71) },
+				requirementDescription: "3 Time Capsules",
+				done() { return player.t.best.gte(3) || hasAchievement("a", 71) },
 				effectDescription: "Keep Booster Upgrades on all resets.",
 			},
 			3: {
-				requirementDescription: "5 Time Capsules",
-				done() { return player.t.best.gte(5) || hasAchievement("a", 71) },
+				requirementDescription: "4 Time Capsules",
+				done() { return player.t.best.gte(4) || hasAchievement("a", 71) },
 				effectDescription: "Unlock Auto-Boosters.",
 				toggles: [["b", "auto"]],
 			},
@@ -1353,7 +1356,7 @@ addLayer("e", {
         },
 		freeEnh() {
 			let enh = new Decimal(0);
-			if (hasUpgrade("e", 13)) enh = enh.plus(1);
+			if (hasUpgrade("e", 13)) enh = enh.plus(2);
 			if (hasUpgrade("e", 21)) enh = enh.plus(2);
 			if (hasUpgrade("e", 23)) enh = enh.plus(upgradeEffect("e", 23));
 			if (hasUpgrade("q", 22)) enh = enh.plus(upgradeEffect("q", 22));
@@ -1396,9 +1399,9 @@ addLayer("e", {
 				},
 			},
 			13: {
-				title: "Enhance Plus",
-				description: "Get a free Enhancer.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1e5":2.5e3) },
+				title: "Enhance Plus Two",
+				description: "Get 2 free Enhancers.",
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1e5":2e3) },
 				unlocked() { return hasUpgrade("e", 11) },
 			},
 			14: {
@@ -1569,14 +1572,19 @@ addLayer("e", {
 				effectDescription: "Keep Booster/Generator milestones on reset.",
 			},
 			1: {
-				requirementDescription: "5 Enhance Points",
-				done() { return player.e.best.gte(5) || hasAchievement("a", 41) || hasAchievement("a", 71) },
+				requirementDescription: "3 Enhance Points",
+				done() { return player.e.best.gte(3) || hasAchievement("a", 41) || hasAchievement("a", 71) },
 				effectDescription: "Keep Prestige Upgrades on reset.",
 			},
 			2: {
 				requirementDescription: "25 Enhance Points",
 				done() { return player.e.best.gte(25) || hasAchievement("a", 71) },
 				effectDescription: "Keep Booster/Generator Upgrades on reset.",
+			},
+      3: {
+				requirementDescription: "4000 Enhance Points",
+				done() { return player.e.best.gte(4000) || hasAchievement("a", 71) },
+				effectDescription: "Generator condensors are 25% stronger.",
 			},
 		},
 })
@@ -1735,7 +1743,7 @@ addLayer("s", {
 			12: {
 				title: "Generator Generator",
 				description: "Generator Power boosts its own generation.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?758:3) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?758:4) },
 				unlocked() { return hasUpgrade("s", 11) },
 				effect() { return player.g.power.add(1).log10().add(1) },
 				effectDisplay() { return format(tmp.s.upgrades[12].effect)+"x" },
@@ -1744,19 +1752,19 @@ addLayer("s", {
 			13: {
 				title: "Shipped Away",
 				description: "Space Building Levels boost Generator Power gain, and you get 2 extra Space.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e48900":([1e37,1e59,1e94][player[this.layer].unlockOrder||0])) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e48900":([1e55,1e59,1e94][player[this.layer].unlockOrder||0])) },
 				currencyDisplayName: "generator power",
                 currencyInternalName: "power",
                 currencyLayer: "g",
 				unlocked() { return hasUpgrade("s", 11) },
-				effect() { return softcap("s13", Decimal.pow(20, tmp.s.totalBuildingLevels)) },
+				effect() { return softcap("s13", Decimal.pow(10, tmp.s.totalBuildingLevels)) },
 				effectDisplay() { return format(tmp.s.upgrades[13].effect)+"x" },
 				formula: "20^x",
 			},
 			14: {
 				title: "Into The Repeated",
 				description: "Unlock the <b>Quaternary Space Building</b>.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:4) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:6) },
 				unlocked() { return hasUpgrade("s", 12)||hasUpgrade("s", 13) }
 			},
 			15: {
@@ -2430,23 +2438,23 @@ addLayer("s", {
 		},
 		milestones: {
 			0: {
-				requirementDescription: "2 Space Energy",
-				done() { return player.s.best.gte(2) || hasAchievement("a", 71) },
+				requirementDescription: "1 Space Energy",
+				done() { return player.s.best.gte(1) || hasAchievement("a", 71) },
 				effectDescription: "Keep Booster/Generator milestones on reset.",
 			},
 			1: {
-				requirementDescription: "3 Space Energy",
-				done() { return player.s.best.gte(3) || hasAchievement("a", 41) || hasAchievement("a", 71) },
-				effectDescription: "Keep Prestige Upgrades on reset.",
+				requirementDescription: "2 Space Energy",
+				done() { return player.s.best.gte(2) || hasAchievement("a", 41) || hasAchievement("a", 71) },
+				effectDescription: "Keep Prestige Upgrades and prestige condensers on reset.",
 			},
 			2: {
-				requirementDescription: "4 Space Energy",
-				done() { return player.s.best.gte(4) || hasAchievement("a", 71) },
+				requirementDescription: "3 Space Energy",
+				done() { return player.s.best.gte(3) || hasAchievement("a", 71) },
 				effectDescription: "Keep Generator Upgrades on all resets.",
 			},
 			3: {
-				requirementDescription: "5 Space Energy",
-				done() { return player.s.best.gte(5) || hasAchievement("a", 71) },
+				requirementDescription: "4 Space Energy",
+				done() { return player.s.best.gte(4) || hasAchievement("a", 71) },
 				effectDescription: "Unlock Auto-Generators.",
 				toggles: [["g", "auto"]],
 			},

@@ -291,7 +291,7 @@ addLayer("b", {
         type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
 		branches: ["p"],
         exponent() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?0.75:1.2 }, // Prestige currency exponent
-		base() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.5:(hasMilestone("b",1)?100:10000) },
+		base() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1.5:hasUpgrade("b",31)?69:(hasMilestone("b",1)?100:10000) },
 		gainMult() { 
 			let mult = new Decimal(1);
 			if (hasUpgrade("b", 23)) mult = mult.div(upgradeEffect("b", 23));
@@ -399,7 +399,7 @@ addLayer("b", {
 				cost() { return tmp.h.costMult11b.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1438:3) },
 				effect() { 
 					let ret = player.b.best.plus(1).pow(1.5);
-					if (hasUpgrade("b", 32)) ret = Decimal.pow(1.125, player.b.best).times(ret);
+					if (hasUpgrade("b", 32)) ret = Decimal.pow(1.2, player.b.best).times(ret);
 					if (hasUpgrade("s", 15)) ret = ret.pow(buyableEffect("s", 14).root(2.7));
 					if (hasUpgrade("b", 14) && player.i.buyables[12].gte(1)) ret = ret.pow(upgradeEffect("b", 14));
 					if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)) ret = ret.pow(1.5);
@@ -510,8 +510,8 @@ addLayer("b", {
 			},
 			31: {
 				title: "Worse BP Combo",
-				description: "Super Boosters boost Prestige Point gain.",
-				cost() { return tmp.h.costMult11b.times(103) },
+				description: "Super Boosters boost Prestige Point gain, and the booster cost base is now 69.",
+				cost() { return tmp.h.costMult11b.times(81) },
 				unlocked() { return hasAchievement("a", 41) },
 				effect() { 
 					let exp = ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?2e4:1
@@ -526,15 +526,15 @@ addLayer("b", {
 			32: {
 				title: "Better BP Combo",
 				description() { return "<b>BP Combo</b> uses a better formula"+(tmp.nerdMode?" (sqrt(x+1) -> (1.125^x)*sqrt(x+1))":"")+"." },
-				cost() { return tmp.h.costMult11b.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1438:111) },
+				cost() { return tmp.h.costMult11b.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?1438:91) },
 				unlocked() { return hasAchievement("a", 41) },
 			},
 			33: {
 				title: "Even More Additions",
 				description: "<b>More Additions</b> is stronger based on your Super Boosters.",
-				cost() { return tmp.h.costMult11b.times(118) },
+				cost() { return tmp.h.costMult11b.times(92) },
 				unlocked() { return hasAchievement("a", 41) },
-				effect() { return player.sb.points.times(player.sb.points.gte(4)?2.6:2).plus(1).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:1) },
+				effect() { return player.sb.points.times(player.sb.points.gte(4)?2.6:2).plus(1).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:0.25) },
 				effectDisplay() { return format(tmp.b.upgrades[33].effect)+"x" },
 				formula() { 
 					let exp = ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:1
@@ -938,7 +938,7 @@ addLayer("t", {
 		enCapMult() {
 			let mult = new Decimal(1);
 			if (hasUpgrade("t", 12)) mult = mult.times(upgradeEffect("t", 12));
-			if (hasUpgrade("t", 21)) mult = mult.times(100);
+			if (hasUpgrade("t", 21)) mult = mult.times(1e10);
 			if (hasUpgrade("t", 22)) mult = mult.times(upgradeEffect("t", 22));
 			if (player.h.unlocked) mult = mult.times(tmp.h.effect);
 			if (player.o.unlocked) mult = mult.times(tmp.o.solEnEff2);
@@ -1110,8 +1110,8 @@ addLayer("t", {
 			},
 			21: {
 				title: "Weakened Chains",
-				description: "The Time Energy limit is multiplied by 100.",
-				cost() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:12 },
+				description: "The Time Energy limit is multiplied by 1e10.",
+				cost() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:10 },
 				unlocked() { return hasAchievement("a", 33) },
 			},
 			22: {
@@ -1338,7 +1338,7 @@ addLayer("e", {
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new Decimal(1)
+            return new Decimal(1).mul(hasUpgrade("e",23)?2:1)
         },
 		passiveGeneration() { return (hasMilestone("q", 1)&&player.ma.current!="e")?1:0 },
 		update(diff) {
@@ -1432,8 +1432,8 @@ addLayer("e", {
 			},
 			23: {
 				title: "Enter the E-Space",
-				description: "Space Energy provides free Enhancers.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.01e5":2e20) },
+				description: "Space Energy provides free Enhancers, and square enhance point gain.",
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.01e5":1e10) },
 				unlocked() { return hasAchievement("a", 33) },
 				effect() {
 					let eff = player.s.points.pow(2).div(25);
@@ -1446,7 +1446,7 @@ addLayer("e", {
 			24: {
 				title: "Monstrous Growth",
 				description: "Boosters & Generators boost Enhance Point gain.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.011e5":2.5e28) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.011e5":1e24) },
 				unlocked() { return hasAchievement("a", 33) },
 				effect() { return Decimal.pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e2000":1.1, player.b.points.plus(player.g.points).pow(0.9)) },
 				effectDisplay() { return format(tmp.e.upgrades[24].effect)+"x" },
@@ -1779,7 +1779,7 @@ addLayer("s", {
 			21: {
 				title: "Spacious",
 				description: "All Space Buildings are 8% stronger.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:13) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?759:10) },
 				unlocked() { return hasAchievement("a", 33) },
 			},
 			22: {
@@ -2471,7 +2471,7 @@ addLayer("sb", {
         symbol: "SB", // This appears on the layer's node. Default is the id with the first letter capitalized
         position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         color: "#504899",
-        requires: new Decimal(100), // Can be a function that takes requirement increases into account
+        requires: new Decimal(80), // Can be a function that takes requirement increases into account
         resource: "super boosters", // Name of prestige currency
         baseResource: "boosters", // Name of resource prestige is based on
         baseAmount() {return player.b.points}, // Get the current amount of baseResource

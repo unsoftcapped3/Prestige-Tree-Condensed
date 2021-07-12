@@ -35,6 +35,15 @@ addLayer("condensers", {
 			unlocked: true,
 			points: new Decimal(0),
 		}},
+  update(diff){
+    if(hasAchievement("a2",22)){
+      for(let i in layers.condensers.buyables){
+        if(layers.condensers.buyables[i].canAfford){
+          if(tmp.condensers.buyables[i].canAfford){layers.condensers.buyables[i].buy()}
+        }
+      }
+    }
+  },
   buyables:{
     rows: 9,
     cols: 3,
@@ -146,6 +155,11 @@ addLayer("a2", {
                 name: "Trolling",
                 done() { return player.condensers.buyables[13].gte(19) },
                 tooltip: "Get 19 generator power condensers. Reward: Each generator power condenser and time energy condenser adds 1 to the booster base",
+            },
+          22: {
+                name: "Super Rare News Ticker",
+                done() { return player.condensers.buyables[21].gte(7)&&player.t.points.gte(7)&&player.s.points.gte(7) },
+                tooltip: "Get 7 time capsules, space energy, and time energy condensers. Reward: Autobuy the first 4 condensers",
             },
 
 		},

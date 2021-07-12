@@ -29,7 +29,7 @@ addLayer("condensers", {
       if(hasMilestone("b",2))player.condensers.buyables[11] = b11
       if(hasUpgrade("b",12)||hasMilestone("s",1))player.condensers.buyables[12] = b12
       if(hasMilestone("g",2))player.condensers.buyables[13] = b13
-      if(layers[resettingLayer].row < this.row+2)player.condensers.buyables[21] = b21
+      if(layers[resettingLayer].row <= this.row+2)player.condensers.buyables[21] = b21
 		},
 		startData() { return {
 			unlocked: true,

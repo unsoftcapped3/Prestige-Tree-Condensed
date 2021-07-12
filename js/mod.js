@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.2",
+	num: "0.3",
 	patch: 0,
-	name: "Row 3, part 1",
+	name: "Row 3, part 2",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -76,7 +76,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: 1e300 points, DO NOT PICK A SECOND ROW 3 LAYER YET"
+  "Endgame: 1e400 OR 1e450 points depending on your choices, DO NOT UNLOCK THE THIRD ROW 3 LAYER YET"
 ]
 
 // Determines when the game "ends"

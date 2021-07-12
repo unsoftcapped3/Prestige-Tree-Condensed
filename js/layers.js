@@ -1371,7 +1371,7 @@ addLayer("e", {
 			11: {
 				title: "Row 2 Synergy",
 				description: "Boosters & Generators boost each other.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e98000":((player.e.unlockOrder>=2)?25:(player.e.unlockOrder==1)?1:100)) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e98000":((player.e.unlockOrder>=2)?10:(player.e.unlockOrder==1)?1:100)) },
 				unlocked() { return player.e.unlocked },
 				effect() { 
 					let exp = 1
@@ -1383,7 +1383,7 @@ addLayer("e", {
 			12: {
 				title: "Enhanced Prestige",
 				description: "Total Enhance Points boost Prestige Point gain.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e98000":(player.e.unlockOrder>=2?400:(player.e.unlockOrder==1)?10:1e3)) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e98000":(player.e.unlockOrder>=2?10:(player.e.unlockOrder==1)?10:1e3)) },
 				unlocked() { return hasUpgrade("e", 11) },
 				effect() { 
 					let ret = player.e.total.add(1).pow(1.5) 
@@ -1426,7 +1426,7 @@ addLayer("e", {
 			22: {
 				title: "Enhanced Reversion",
 				description: "Enhance acts as if you chose it first.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.01e5":(player.e.unlockOrder>=2?1e3:(player.e.unlockOrder==1)?0:3e4)) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1.01e5":(player.e.unlockOrder>=2?10:(player.e.unlockOrder==1)?0:3e4)) },
 				unlocked() { return (player[this.layer].unlockOrder>0||hasUpgrade("e", 22))&&hasUpgrade("e", 12) },
 				onPurchase() { player[this.layer].unlockOrder = 0; },
 			},
@@ -1737,7 +1737,7 @@ addLayer("s", {
 			11: {
 				title: "Space X",
 				description: "Add a free level to all Space Buildings.",
-				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?758:(player.s.unlockOrder==1?1:2)) },
+				cost() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?758:(player.s.unlockOrder>=1?1:2)) },
 				unlocked() { return player[this.layer].unlocked }
 			},
 			12: {

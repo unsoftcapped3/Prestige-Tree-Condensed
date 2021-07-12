@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.5",
+	num: "0.6",
 	patch: 0,
-	name: "Row 3",
+	name: "Quirk",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -76,7 +76,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: 1e650 points"
+  "Endgame: 100 quirks and 100 hinderance spirit"
 ]
 
 // Determines when the game "ends"

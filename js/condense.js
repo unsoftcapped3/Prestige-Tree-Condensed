@@ -25,11 +25,13 @@ addLayer("condensers", {
       let b12 = player.condensers.buyables[12]
       let b13 = player.condensers.buyables[13]
       let b21 = player.condensers.buyables[21]
+       let b22 = player.condensers.buyables[22]
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
       if(hasMilestone("b",2))player.condensers.buyables[11] = b11
       if(hasUpgrade("b",12)||hasMilestone("s",1))player.condensers.buyables[12] = b12
       if(hasMilestone("g",2))player.condensers.buyables[13] = b13
       if(layers[resettingLayer].row <= this.row+2)player.condensers.buyables[21] = b21
+      if(layers[resettingLayer].row <= this.row+3)player.condensers.buyables[22] = b22
 		},
 		startData() { return {
 			unlocked: true,
@@ -39,7 +41,7 @@ addLayer("condensers", {
     if(hasAchievement("a2",22)){
       for(let i in layers.condensers.buyables){
         if(layers.condensers.buyables[i].canAfford){
-          if(tmp.condensers.buyables[i].canAfford){layers.condensers.buyables[i].buy()}
+          if(tmp.condensers.buyables[i].canAfford&&tmp.condensers.buyables[i].unlocked&&i<22){layers.condensers.buyables[i].buy()}
         }
       }
     }
@@ -84,7 +86,9 @@ addLayer("condensers", {
             setBuyableAmount(this.layer, this.id, player.condensers.buyables[13].add(1))
         },
         effect(){
-          let e= player.g.power.add(1).log10().add(1).pow(player.condensers.buyables[13])
+          let x = player.condensers.buyables[13]
+          if(x.gte(70))x=Decimal.pow(70,0.1).mul(x.pow(0.9))
+          let e= player.g.power.add(1).log10().add(1).pow(x)
           if(hasMilestone("e",3))e=e.pow(1.25)
           return e
         },
@@ -103,6 +107,20 @@ addLayer("condensers", {
           return e
         },
       unlocked(){return player.t.unlocked}
+    },
+    22: {
+        cost() { return new Decimal(25).mul(Decimal.pow(2,player.condensers.buyables[this.id].pow(1.6))) },
+        display() { return "Condense your quirks for "+format(this.cost())+" quirks. Your condensers are multiplying quirk energy gain by "+format(this.effect()) },
+        canAfford() { return player.q.points.gte(this.cost()) },
+        buy() {
+            player.q.points = player.q.points.sub(this.cost())
+            setBuyableAmount(this.layer, this.id, player.condensers.buyables[this.id].add(1))
+        },
+        effect(){
+          let e= player.q.points.add(1).log10().add(1).pow(player.condensers.buyables[this.id])
+          return e
+        },
+      unlocked(){return hasMilestone("q",5)}
     },
   },tooltip:"Condensers",
 tabFormat: {

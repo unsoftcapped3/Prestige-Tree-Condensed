@@ -534,7 +534,7 @@ addLayer("b", {
 				description: "<b>More Additions</b> is stronger based on your Super Boosters.",
 				cost() { return tmp.h.costMult11b.times(92) },
 				unlocked() { return hasAchievement("a", 41) },
-				effect() { return player.sb.points.times(player.sb.points.gte(4)?2.6:2).plus(1).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:0.25) },
+				effect() { return player.sb.points.times(player.sb.points.gte(4)?2.6:2).plus(1).pow(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:1) },
 				effectDisplay() { return format(tmp.b.upgrades[33].effect)+"x" },
 				formula() { 
 					let exp = ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?3:1
@@ -2642,7 +2642,7 @@ addLayer("h", {
 			auto: false,
         }},
         color: "#a14040",
-        requires: new Decimal(1e30), // Can be a function that takes requirement increases into account
+        requires: new Decimal(1e40), // Can be a function that takes requirement increases into account
         resource: "hindrance spirit", // Name of prestige currency
         baseResource: "time energy", // Name of resource prestige is based on
         baseAmount() {return player.t.energy}, // Get the current amount of baseResource
@@ -2985,6 +2985,7 @@ addLayer("q", {
 			if (hasUpgrade("q", 21)) mult = mult.times(upgradeEffect("q", 21));
 			if (player.o.unlocked) mult = mult.times(buyableEffect("o", 12));
 			if (player.ba.unlocked) mult = mult.times(tmp.ba.negBuff);
+      mult=mult.mul(buyableEffect("condensers",22))
 			return mult;
 		},
 		enGainExp() {
@@ -3125,7 +3126,7 @@ addLayer("q", {
 			5: {
 				requirementDescription: "25 Total Quirks",
 				done() { return player.q.total.gte(25) || hasAchievement("a", 71) },
-				effectDescription: "Time, Space, & Super-Boosters reset nothing, and you can destroy individual Space Buildings.",
+				effectDescription: "Time, Space, & Super-Boosters reset nothing, and you can destroy individual Space Buildings. Unlock quirk energy condensers.",
 			},
 			6: {
 				unlocked() { return player.sg.unlocked },

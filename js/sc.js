@@ -7,6 +7,14 @@ const SOFTCAPS = {
 		display() { return player.points.gte("1e6") },
 		info() { return "Starts at "+format(this.start)+", cube rooted" },
 	},
+   gp_condenser: {
+		title: "Generator condenser level",
+		type: "root",
+		start: new Decimal("70"),
+		mag: new Decimal(10/9),
+		display() { return player.condensers.buyables[13].gte("70") },
+		info() { return "Starts at "+format(this.start)+", ^0.9" },
+	},
 	normal_layers: {
 		title: "Non-Static Layer Gain",
 		type: "root",

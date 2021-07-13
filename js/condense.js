@@ -26,12 +26,14 @@ addLayer("condensers", {
       let b13 = player.condensers.buyables[13]
       let b21 = player.condensers.buyables[21]
        let b22 = player.condensers.buyables[22]
+       let b23 = player.condensers.buyables[23]
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
       if(hasMilestone("b",2))player.condensers.buyables[11] = b11
       if(hasUpgrade("b",12)||hasMilestone("s",1))player.condensers.buyables[12] = b12
       if(hasMilestone("g",2))player.condensers.buyables[13] = b13
-      if(layers[resettingLayer].row <= this.row+2)player.condensers.buyables[21] = b21
+      if(layers[resettingLayer].row <= this.row+2||hasChallenge("h",22))player.condensers.buyables[21] = b21
       if(layers[resettingLayer].row <= this.row+3)player.condensers.buyables[22] = b22
+      if(layers[resettingLayer].row <= this.row+3)player.condensers.buyables[23] = b23
 		},
 		startData() { return {
 			unlocked: true,
@@ -39,19 +41,21 @@ addLayer("condensers", {
 		}},
   update(diff){
     if(hasAchievement("a2",22)){
-      for(let i in layers.condensers.buyables){
-        if(layers.condensers.buyables[i].canAfford){
-          if(tmp.condensers.buyables[i].canAfford&&tmp.condensers.buyables[i].unlocked&&i<22){layers.condensers.buyables[i].buy()}
-        }
-      }
+      if(tmp.condensers.buyables[11].canAfford)setBuyableAmount("condensers",11,player.points.div(5).max(0.5).log(3).root(1.75).floor().add(1))
+      if(tmp.condensers.buyables[12].canAfford)setBuyableAmount("condensers",12,player.p.points.div(10000).max(0.5).log(3).root(1.75).floor().add(1))
+      if(tmp.condensers.buyables[13].canAfford)setBuyableAmount("condensers",13,player.g.power.div(1e6).max(0.5).log(8).root(1.5).floor().add(1))
+      if(tmp.condensers.buyables[21].canAfford)setBuyableAmount("condensers",21,player.t.energy.div(1e6).max(0.5).log(7).root(1.7).floor().add(1))
+      
     }
+    if(hasMilestone("m",2)&&tmp.condensers.buyables[23].canAfford)setBuyableAmount("condensers",23,player.o.energy.div(1e4).max(0.5).log(10).root(1.75).floor().add(1))
+    if(hasMilestone("ba",1)&&tmp.condensers.buyables[22].canAfford)setBuyableAmount("condensers",22,player.q.points.div(25).max(0.5).log(2).root(1.6).floor().add(1))
   },
   buyables:{
     rows: 9,
     cols: 3,
       11: {
         cost() { return new Decimal(5).mul(Decimal.pow(3,player.condensers.buyables[11].pow(1.75))) },
-        display() { return "Condense your points for "+format(this.cost())+" points. Your condensers are multiplying point gain by "+format(this.effect()) },
+        display() { return "Condense your points for "+format(this.cost())+" points. Your "+player.condensers.buyables[this.id]+" condensers are multiplying point gain by "+format(this.effect()) },
         canAfford() { return player.points.gte(this.cost()) },
         buy() {
             player.points = player.points.sub(this.cost())
@@ -60,12 +64,13 @@ addLayer("condensers", {
         effect(){
           let e= player.points.add(1).log10().add(1).pow(player.condensers.buyables[11].add(hasAchievement("a2",12)?player.condensers.buyables[12]:0))
           if(hasAchievement("a2",11))e=e.pow(1.5)
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
           return e
         }
     },
     12: {
         cost() { return new Decimal(10000).mul(Decimal.pow(3,player.condensers.buyables[12].pow(1.75))) },
-        display() { return "Condense your prestige points for "+format(this.cost())+" prestige points. Your condensers are multiplying prestige point gain by "+format(this.effect()) },
+        display() { return "Condense your prestige points for "+format(this.cost())+" prestige points. Your "+player.condensers.buyables[this.id]+" condensers are multiplying prestige point gain by "+format(this.effect()) },
         canAfford() { return player.p.points.gte(this.cost()) },
         buy() {
             player.p.points = player.p.points.sub(this.cost())
@@ -73,22 +78,25 @@ addLayer("condensers", {
         },
         effect(){
           let e= player.p.points.add(1).log10().add(1).pow(player.condensers.buyables[12])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
           return e
         },
       unlocked(){return player.b.unlocked||player.g.unlocked}
     },
     13: {
         cost() { return new Decimal(1e6).mul(Decimal.pow(8,player.condensers.buyables[13].pow(1.5))) },
-        display() { return "Condense your generator power for "+format(this.cost())+" generator power. Your condensers are multiplying generator power gain by "+format(this.effect()) },
+        display() { return "Condense your generator power for "+format(this.cost())+" generator power. Your "+player.condensers.buyables[this.id]+" condensers are multiplying generator power gain by "+format(this.effect()) },
         canAfford() { return player.g.power.gte(this.cost()) },
         buy() {
             player.g.power = player.g.power.sub(this.cost())
             setBuyableAmount(this.layer, this.id, player.condensers.buyables[13].add(1))
+          
         },
         effect(){
           let x = player.condensers.buyables[13]
           if(x.gte(70))x=Decimal.pow(70,0.1).mul(x.pow(0.9))
           let e= player.g.power.add(1).log10().add(1).pow(x)
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
           if(hasMilestone("e",3))e=e.pow(1.25)
           return e
         },
@@ -96,7 +104,7 @@ addLayer("condensers", {
     },
     21: {
         cost() { return new Decimal(1e6).mul(Decimal.pow(7,player.condensers.buyables[21].pow(1.7))) },
-        display() { return "Condense your time energy for "+format(this.cost())+" time energy. Your condensers are multiplying time energy gain and cap by "+format(this.effect()) },
+        display() { return "Condense your time energy for "+format(this.cost())+" time energy. Your "+player.condensers.buyables[this.id]+" condensers are multiplying time energy gain and cap by "+format(this.effect()) },
         canAfford() { return player.t.energy.gte(this.cost()) },
         buy() {
             player.t.energy = player.t.energy.sub(this.cost())
@@ -104,13 +112,14 @@ addLayer("condensers", {
         },
         effect(){
           let e= player.t.energy.add(1).log10().add(1).pow(player.condensers.buyables[21])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
           return e
         },
       unlocked(){return player.t.unlocked}
     },
     22: {
         cost() { return new Decimal(25).mul(Decimal.pow(2,player.condensers.buyables[this.id].pow(1.6))) },
-        display() { return "Condense your quirks for "+format(this.cost())+" quirks. Your condensers are multiplying quirk energy gain by "+format(this.effect()) },
+        display() { return "Condense your quirks for "+format(this.cost())+" quirks. Your "+player.condensers.buyables[this.id]+" condensers are multiplying quirk energy gain by "+format(this.effect()) },
         canAfford() { return player.q.points.gte(this.cost()) },
         buy() {
             player.q.points = player.q.points.sub(this.cost())
@@ -118,9 +127,25 @@ addLayer("condensers", {
         },
         effect(){
           let e= player.q.points.add(1).log10().add(1).pow(player.condensers.buyables[this.id])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
           return e
         },
       unlocked(){return hasMilestone("q",5)}
+    },
+    23: {
+        cost() { return new Decimal(10000).mul(Decimal.pow(10,player.condensers.buyables[this.id].pow(1.75))) },
+        display() { return "Condense your solar energy for "+format(this.cost())+" solar energy. Your "+player.condensers.buyables[this.id]+" condensers are multiplying solarity gain by "+format(this.effect()) },
+        canAfford() { return player.o.energy.gte(this.cost()) },
+        buy() {
+            player.o.energy = player.o.energy.sub(this.cost())
+            setBuyableAmount(this.layer, this.id, player.condensers.buyables[this.id].add(1))
+        },
+        effect(){
+          let e= player.o.energy.add(1).log10().add(1).pow(player.condensers.buyables[this.id])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
+          return e
+        },
+      unlocked(){return hasMilestone("o",1)}
     },
   },tooltip:"Condensers",
 tabFormat: {
@@ -178,6 +203,11 @@ addLayer("a2", {
                 name: "Super Rare News Ticker",
                 done() { return player.condensers.buyables[21].gte(7)&&player.t.points.gte(7)&&player.s.points.gte(7) },
                 tooltip: "Get 7 time capsules, space energy, and time energy condensers. Reward: Autobuy the first 4 condensers",
+            },
+          23: {
+                name: "Claim a role",
+                done() { return player.points.gte("e6969") },
+                tooltip: "Have e6969 points. Reward: Quirks multiply enhance point gain and all condensers are 1% stronger per achievement in this layer",
             },
 
 		},

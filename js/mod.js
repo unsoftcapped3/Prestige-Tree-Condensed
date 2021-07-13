@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.6",
+	num: "0.7",
 	patch: 0,
-	name: "Quirk",
+	name: "Row 5",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -40,7 +40,7 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
-  gain=gain.mul(buyableEffect("condensers",11))
+  if (!inChallenge("h", 22))gain=gain.mul(buyableEffect("condensers",11))
 	if (hasUpgrade("p", 12)) gain = gain.times(upgradeEffect("p", 12));
 	if (hasUpgrade("p", 13)) gain = gain.times(upgradeEffect("p", 13));
 	if (hasUpgrade("p", 22)) gain = gain.times(upgradeEffect("p", 22));
@@ -48,6 +48,7 @@ function getPointGen() {
 	if (((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("e"):false) && hasUpgrade("e", 12)) gain = gain.times(upgradeEffect("e", 12))
 	if (hasAchievement("a", 21)) gain = gain.times(1.1);
 	if (hasAchievement("a", 31)) gain = gain.times(1.5);
+  if (inChallenge("h", 22))if(gain.gte(1e6))gain=gain.pow(1/3).mul(1e4)
 	if (inChallenge("h", 22)) return gain.times(player.s.unlocked?buyableEffect("s", 11):1).root(inChallenge("h", 31)?tmp.h.pointRoot31:1);
 	
 	if (player.b.unlocked) gain = gain.times(tmp.b.effect);
@@ -76,7 +77,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: 100 quirks and 100 hinderance spirit"
+  "Endgame: e45 magic and balance energy"
 ]
 
 // Determines when the game "ends"

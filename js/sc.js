@@ -15,6 +15,22 @@ const SOFTCAPS = {
 		display() { return player.condensers.buyables[13].gte("70") },
 		info() { return "Starts at "+format(this.start)+", ^0.9" },
 	},
+  quirk_energy_gain: {
+		title: "Quirk energy gain",
+		type: "root",
+		start: new Decimal("1e10"),
+		mag: new Decimal(3),
+		display() { return player.q.energy.gte("1e10") },
+		info() { return "Starts at "+format(this.start)+", cube rooted" },
+	},
+  quirk_energy_gain2: {
+		title: "Quirk energy gain",
+		type: "root",
+		start: new Decimal("1e1700"),
+		mag(){return new Decimal(hasMilestone("m",5)?2:3)},
+		display() { return player.q.energy.gte("1e1700") },
+		info() { return ("Starts at "+format(this.start)+", "+(hasMilestone("m",5)?"squar":"cub")+"e rooted") },
+	},
 	normal_layers: {
 		title: "Non-Static Layer Gain",
 		type: "root",

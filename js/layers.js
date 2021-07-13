@@ -1335,6 +1335,7 @@ addLayer("e", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1)
 			if (hasUpgrade("e", 24)) mult = mult.times(upgradeEffect("e", 24));
+          if(hasAchievement("a2",23))mult=mult.mul(player.q.points.add(1))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -2546,7 +2547,7 @@ addLayer("sg", {
         symbol: "SG", // This appears on the layer's node. Default is the id with the first letter capitalized
         position: 4, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         color: "#248239",
-        requires: new Decimal(200), // Can be a function that takes requirement increases into account
+        requires: new Decimal(115), // Can be a function that takes requirement increases into account
         resource: "super generators", // Name of prestige currency
         baseResource: "generators", // Name of resource prestige is based on
         baseAmount() {return player.g.points}, // Get the current amount of baseResource
@@ -2738,7 +2739,7 @@ addLayer("h", {
 				completionLimit: 1,
 				challengeDescription: "Prestige/Booster Upgrades are reset regardless of your milestones, and every Prestige/Booster Upgrade you buy drastically increases the costs of the others.",
 				unlocked() { return player.h.unlocked },
-				goal() { return new Decimal(player.ma.current=="h"?"e1.37e8":"1e1325") },
+				goal() { return new Decimal(player.ma.current=="h"?"e1.37e8":"1e880") },
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription: "Unlock Quirk Upgrades, and the Hindrance Spirit effect is raised to the power of 1.2.",
@@ -2754,7 +2755,7 @@ addLayer("h", {
 				completionLimit: 1,
 				challengeDescription: "The Booster/Generator bases are divided more over time (this effect is magnified by your Super-Boosters).",
 				unlocked() { return hasChallenge("h", 11) },
-				goal() { return new Decimal(player.ma.current=="h"?"e5e8":"1e3550") },
+				goal() { return new Decimal(player.ma.current=="h"?"e5e8":"1e4830") },
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription() { return "Add 0.25 to the Super Booster base"+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?(" and multiply it by your Hyperspace Energy"):"")+"." },
@@ -2764,7 +2765,7 @@ addLayer("h", {
 				completionLimit: 1,
 				challengeDescription: "Space Buildings are respecced, your Space is divided by 10, and Space Building Power is decreased by 90%.",
 				unlocked() { return hasChallenge("h", 12) },
-				goal() { return new Decimal(player.ma.current=="h"?"e5.7e7":"1e435") },
+				goal() { return new Decimal(player.ma.current=="h"?"e5.7e7":"1e3434") },
 				currencyDisplayName: "generator power",
 				currencyInternalName: "power",
 				currencyLayer: "g",
@@ -2782,12 +2783,12 @@ addLayer("h", {
 			22: {
 				name: "Descension",
 				completionLimit: 1,
-				challengeDescription: "Prestige Upgrades, Achievement rewards, & the Primary Space Building are the only things that boost Point generation.",
+				challengeDescription: "Prestige Upgrades, Normal Achievement rewards, & the Primary Space Building are the only things that boost Point generation.",
 				unlocked() { return hasChallenge("h", 21) },
-				goal() { return new Decimal(player.ma.current=="h"?"e8.225e6":"1e3570") },
+				goal() { return new Decimal(player.ma.current=="h"?"e8.225e6":"1e1196") },
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
-				rewardDescription: "<b>Prestige Boost</b>'s hardcap is now a softcap.",
+				rewardDescription: "<b>Prestige Boost</b>'s hardcap is now a softcap and always keep time energy condensers.",
 			},
 			31: {
 				name: "Timeless",
@@ -2812,11 +2813,11 @@ addLayer("h", {
 				goal() { 
 					let comps = Decimal.mul(challengeCompletions("h", 31), tmp.h.challenges[this.id].scalePower);
 					if (comps.gte(20)) comps = Decimal.pow(comps.sub(19), 1.95).plus(19);
-					return Decimal.pow("1e50", Decimal.pow(comps, 2.5)).times("1e5325") 
+					return Decimal.pow("1e50", Decimal.pow(comps, 2.5)).times("1e3500") 
 				},
 				completeInBulk() {
 					if (challengeCompletions("h", 31)>=tmp[this.layer].challenges[this.id].completionLimit) return;
-					let target = player.points.div("1e5325").max(1).log("1e50").root(2.5)
+					let target = player.points.div("1e3500").max(1).log("1e50").root(2.5)
 					if (target.gte(20)) target = target.sub(19).root(1.95).plus(19);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
 					player.h.challenges[this.id] = Math.min(Math.max(player.h.challenges[this.id], target.toNumber()), tmp[this.layer].challenges[this.id].completionLimit);
@@ -2854,11 +2855,11 @@ addLayer("h", {
 					let comps = Decimal.mul(challengeCompletions("h", 32), tmp.h.challenges[this.id].scalePower);
 					if (comps.gte(3)) comps = comps.sub(0.96);
 					if (comps.gte(3.04)) comps = comps.times(1.425);
-					return Decimal.pow("1e1000", Decimal.pow(comps, 3)).times("1e9000");
+					return Decimal.pow("1e300", Decimal.pow(comps, 2)).times("1e3950");
 				},
 				completeInBulk() {
 					if (challengeCompletions("h", 32)>=tmp[this.layer].challenges[this.id].completionLimit) return;
-					let target = player.points.div("1e9000").max(1).log("1e1000").cbrt();
+					let target = player.points.div("1e3950").max(1).log("1e300").sqrt();
 					if (target.gte(3.04)) target = target.div(1.425);
 					if (target.gte(3)) target = target.plus(.96);
 					target = target.div(tmp.h.challenges[this.id].scalePower).plus(1).floor();
@@ -3000,7 +3001,10 @@ addLayer("q", {
 		},
 		update(diff) {
 			player.q.time = player.q.time.plus(diff);
-			if (tmp.q.enGainExp.gte(0)) player.q.energy = player.q.energy.plus(player.q.time.times(tmp.q.enGainMult).pow(tmp.q.enGainExp).times(diff));
+      let gain = player.q.time.times(tmp.q.enGainMult).pow(tmp.q.enGainExp).times(diff)
+      if(gain.gte(1e10))gain=gain.cbrt().mul(Decimal.pow(1e10,2/3))
+      if(gain.gte("e1700"))gain=gain.root(hasMilestone("m",5)?2:3).mul(Decimal.pow("e1700",hasMilestone("m",5)?0.5:2/3))
+			if (tmp.q.enGainExp.gte(0)) player.q.energy = player.q.energy.plus(gain);
 			if (hasMilestone("ba", 1) && player.q.auto && player.ma.current!="q") layers.q.buyables[11].buyMax();
 		},
 		passiveGeneration() { return (hasMilestone("ba", 0)&&player.ma.current!="q")?1:0 },
@@ -3582,6 +3586,7 @@ addLayer("o", {
 		}, // Prestige currency exponent
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = buyableEffect("o", 11);
+          mult=mult.mul(buyableEffect("condensers",23))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -3911,6 +3916,11 @@ addLayer("o", {
 				done() { return player.o.total.gte(5e4) || hasAchievement("a", 71) },
 				effectDescription: "Gain 5% of Solarity gain every second.",
 			},
+      1: {
+				requirementDescription: "25 Total Solarity",
+				done() { return player.o.total.gte(25) || hasAchievement("a", 71) },
+				effectDescription: "Unlock solar energy condensers",
+			},
 		},
 })
 
@@ -3927,7 +3937,7 @@ addLayer("ss", {
 			first: 0,
         }},
         color: "#e8ffff",
-        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 62))?30:28) }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal(24) }, // Can be a function that takes requirement increases into account
 		roundUpCost: true,
         resource: "subspace energy", // Name of prestige currency
         baseResource: "space energy", // Name of resource prestige is based on
@@ -4171,7 +4181,7 @@ addLayer("m", {
 			first: 0,
         }},
         color: "#eb34c0",
-        requires: new Decimal(1e285), // Can be a function that takes requirement increases into account
+        requires: new Decimal("1e450"), // Can be a function that takes requirement increases into account
         resource: "magic", // Name of prestige currency
         baseResource: "hindrance spirit", // Name of resource prestige is based on
         baseAmount() {return player.h.points}, // Get the current amount of baseResource
@@ -4489,19 +4499,19 @@ addLayer("m", {
 		},
 		milestones: {
 			0: {
-				requirementDescription: "2 Total Magic",
-				done() { return player.m.total.gte(2) || (hasMilestone("hn", 0)) },
+				requirementDescription: "1 Total Magic",
+				done() { return player.m.total.gte(1) || (hasMilestone("hn", 0)) },
 				effectDescription: "Automatically gain 100% of Solarity gain & Solarity buyables every second.",
 			},
 			1: {
-				requirementDescription: "3 Total Magic",
-				done() { return player.m.total.gte(3) || (hasMilestone("hn", 0)) },
+				requirementDescription: "2 Total Magic",
+				done() { return player.m.total.gte(2) || (hasMilestone("hn", 0)) },
 				effectDescription: 'Keep all Hindrance completions on all resets.',
 			},
 			2: {
 				requirementDescription: "10 Total Magic",
 				done() { return player.m.total.gte(10) || (hasMilestone("hn", 0)) },
-				effectDescription: "Automatically gain 100% of Hindrance Spirit gain every second.",
+				effectDescription: "Automatically gain 100% of Hindrance Spirit gain every second and autobuy solarity condensers.",
 			},
 			3: {
 				requirementDescription: "5,000 Total Magic",
@@ -4519,6 +4529,12 @@ addLayer("m", {
 				done() { return player.m.total.gte(1e10) || (hasMilestone("hn", 0)) },
 				effectDescription: "When casting a Spell, all Spells are casted equally (magic is distributed).",
 				toggles: [["m", "distrAll"]],
+			},
+      5: {
+				unlocked() { return hasMilestone("m", 3) },
+				requirementDescription: "1e12 Total Magic",
+				done() { return player.m.total.gte(1e12) || (hasMilestone("hn", 0)) },
+				effectDescription: "The 2nd quirk energy softcap is now a square root.",
 			},
 		},
 })
@@ -4539,7 +4555,7 @@ addLayer("ba", {
 			first: 0,
         }},
         color: "#fced9f",
-        requires: new Decimal("1e365"), // Can be a function that takes requirement increases into account
+        requires: new Decimal("1e490"), // Can be a function that takes requirement increases into account
         resource: "balance energy", // Name of prestige currency
         baseResource: "quirks", // Name of resource prestige is based on
         baseAmount() {return player.q.points}, // Get the current amount of baseResource
@@ -4806,14 +4822,14 @@ addLayer("ba", {
 		},
 		milestones: {
 			0: {
-				requirementDescription: "2 Total Balance Energy",
-				done() { return player.ba.total.gte(2) || (hasMilestone("hn", 0)) },
+				requirementDescription: "1 Total Balance Energy",
+				done() { return player.ba.total.gte(1) || (hasMilestone("hn", 0)) },
 				effectDescription: "Gain 100% of Quirks gained every second, and keep Quirk Upgrades on all resets.",
 			},
 			1: {
-				requirementDescription: "3 Total Balance Energy",
-				done() { return player.ba.total.gte(3) || (hasMilestone("hn", 0)) },
-				effectDescription: "Unlock Auto-Quirk Layers.",
+				requirementDescription: "2 Total Balance Energy",
+				done() { return player.ba.total.gte(2) || (hasMilestone("hn", 0)) },
+				effectDescription: "Unlock Auto-Quirk Layers, and automatically buy quirk condensers.",
 				toggles: [["q", "auto"]],
 			},
 			2: {
@@ -4855,7 +4871,7 @@ addLayer("ps", {
 			first: 0,
         }},
         color: "#b38fbf",
-        requires() { return new Decimal("1e16000") }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal("1e13000") }, // Can be a function that takes requirement increases into account
         resource: "phantom souls", // Name of prestige currency
         baseResource: "quirk energy", // Name of resource prestige is based on
         baseAmount() {return player.q.energy}, // Get the current amount of baseResource

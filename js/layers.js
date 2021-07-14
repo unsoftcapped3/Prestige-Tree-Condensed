@@ -129,7 +129,7 @@ addLayer("p", {
 			14: {
 				title: "Prestigious Intensity",
 				description: "<b>Prestige Boost</b>'s effect is cubed (unaffected by softcap).",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e589":"1e4070000").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e589":"1e8380000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && hasUpgrade("p", 13) },
 				pseudoReq: 'Req: 1e168,000 Prestige Points in the "Productionless" Hindrance',
 				pseudoCan() { return player.p.points.gte("1e168000")&&inChallenge("h", 42) },
@@ -189,7 +189,7 @@ addLayer("p", {
 			24: {
 				title: "Plasmic Energies",
 				description: "The Tachoclinal Plasma effect uses a better formula (log(log(x+1)+1)*10+1 -> 10^cbrt(log(x+1))).",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11435":"e5070000").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11435":"e4800000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && (hasUpgrade("p", 14)||hasUpgrade("p", 23)) },
 				pseudoReq: "Req: 41,250 Damned Souls without any Wraiths.",
 				pseudoCan() { return player.ps.souls.gte(41250) && player.ps.buyables[11].eq(0) },
@@ -232,10 +232,10 @@ addLayer("p", {
 			41: {
 				title: "Prestige Recursion",
 				description: "Prestige Points boost their own gain.",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e9570":"1e4460000").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e9570":"1e3200000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && hasUpgrade("p", 31) },
-				pseudoReq: "Req: 25 Total Honour",
-				pseudoCan() { return player.hn.total.gte(25) },
+				pseudoReq: "Req: 40 Total Honour",
+				pseudoCan() { return player.hn.total.gte(40) },
 				unlocked() { return player.p.pseudoUpgs.includes(Number(this.id)) },
 				effect() { 
 					let eff = Decimal.pow(10, player.p.points.plus(1).log10().pow(.8));
@@ -248,25 +248,25 @@ addLayer("p", {
 			42: {
 				title: "Spatial Awareness",
 				description: "Space Building costs scale 50% slower.",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11445":"e5960000").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11445":"e3420000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && hasUpgrade("p", 32) },
-				pseudoReq: "Req: 1e100 Solarity",
-				pseudoCan() { return player.o.points.gte(1e100) },
+				pseudoReq: "Req: 1e1430 Solarity",
+				pseudoCan() { return player.o.points.gte("e1430") },
 				unlocked() { return player.p.pseudoUpgs.includes(Number(this.id)) },
 			},
 			43: {
 				title: "Booster Potential",
 				description: "Quirk Energy also affects the Booster effect.",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11467":"e8888888").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11467":"e9500000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && hasUpgrade("p", 33) },
-				pseudoReq: "Req: e10,000,000 Points",
-				pseudoCan() { return player.points.gte("ee7") },
+				pseudoReq: "Req: e5,400,000 Points",
+				pseudoCan() { return player.points.gte("e5.4e6") },
 				unlocked() { return player.p.pseudoUpgs.includes(Number(this.id)) },
 			},
 			44: {
 				title: "Spelling Dictionary",
 				description: "The softcaps for the first two Spells start later based on your Boosters.",
-				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11456":"e6500000").pow(tmp.h.costExp11) },
+				cost() { return tmp.h.costMult11.times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"1e11456":"e3600000").pow(tmp.h.costExp11) },
 				pseudoUnl() { return hasUpgrade("hn", 11) && hasUpgrade("p", 33) },
 				pseudoReq: "Req: 150,000 Primary Space Buildings",
 				pseudoCan() { return player.s.buyables[11].gte(1.5e5) },
@@ -2893,7 +2893,7 @@ addLayer("h", {
 				name: "Central Madness",
 				completionLimit: 1,
 				challengeDescription: "Perform a Row 5 reset, Positivity & Negativity are reset, and Positivity & Negativity nerfs are extremely stronger.",
-				goal: new Decimal("1e765000"),
+				goal: new Decimal("1e115000"),
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription: "Unlock 3 new Balance Upgrades.",
@@ -2914,7 +2914,7 @@ addLayer("h", {
 				name: "Productionless",
 				completionLimit: 1,
 				challengeDescription: "Perform a Row 5 reset, you are trapped in <b>Descension</b>, and all row 2-4 static layers have much harsher cost scalings.",
-				goal: new Decimal("1e19000"),
+				goal: new Decimal("1e8366"),
 				currencyDisplayName: "points",
 				currencyInternalName: "points",
 				rewardDescription() { return "The Quirk Layer cost base is decreased by 0."+(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false)?"2":"15")+", and unlock 2 new Subspace Upgrades." },
@@ -4129,7 +4129,7 @@ addLayer("ss", {
 			42: {
 				title: "Sub-Subspace",
 				description: "Space Buildings are 100% stronger (additive).",
-				cost() { return new Decimal((player.ma.current=="ss")?"1e17799":"1e936") },
+				cost() { return new Decimal((player.ma.current=="ss")?"1e17799":"1e805") },
 				currencyDisplayName: "subspace",
 				currencyInternalName: "subspace",
 				currencyLayer: "ss",
@@ -4138,8 +4138,8 @@ addLayer("ss", {
 			43: {
 				title: "Challenging Speedup",
 				endpoint() { return new Decimal(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?"e1e11":"e1e6") },
-				description() { return "When below "+format(tmp.ss.upgrades[43].endpoint)+", Point gain is raised to the power of 1.1. Otherwise, it is raised to the power of 1.01." },
-				cost() { return new Decimal((player.ma.current=="ss")?"1e17800":"1e990") },
+				description() { return "When below "+format(tmp.ss.upgrades[43].endpoint)+", Point gain is raised to the power of 1.1. Otherwise, it is raised to the 1.03." },
+				cost() { return new Decimal((player.ma.current=="ss")?"1e17800":"1e840") },
 				currencyDisplayName: "subspace",
 				currencyInternalName: "subspace",
 				currencyLayer: "ss",
@@ -4636,6 +4636,7 @@ addLayer("ba", {
 			["row", [["upgrade", 22], ["upgrade", 21], ["upgrade", 23]]],
 			["row", [["upgrade", 31], ["upgrade", 24], ["upgrade", 32]]],
 			["upgrade", 33],
+                ["upgrade",34],
 			"blank", "blank"
 		],
 		bars: {
@@ -4819,6 +4820,12 @@ addLayer("ba", {
 				cost() { return new Decimal(player.ma.current=="ba"?"1e207500":2.5e51) },
 				unlocked() { return hasChallenge("h", 41) },
 			},
+      34: {
+				title: "Unbalanced Games",
+				description: "Time and prestige condensers are 2x as strong.",
+				cost() { return new Decimal(player.ma.current=="ba"?"1e9e10":8.88e88) },
+				unlocked() { return hasUpgrade("ss", 43) },
+			},
 		},
 		milestones: {
 			0: {
@@ -4879,7 +4886,9 @@ addLayer("ps", {
         exponent: new Decimal(1.5), // Prestige currency exponent
 		base() { 
 			let b = new Decimal("1e8000").root(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes(this.layer):false)?2:1);
+      if(hasAchievement("a2",24))b=b.div("e2200")
 			if (tmp.ps.impr[32].unlocked) b = b.root(improvementEffect("ps", 32));
+      
 			return b;
 		},
         gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -5340,7 +5349,7 @@ addLayer("hn", {
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"ee10":"1e4000000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"ee10":"1e3200000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 11) },
@@ -5375,7 +5384,7 @@ addLayer("hn", {
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e4.5e10":"1e3900000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e4.5e10":"1e3000000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 13) },
@@ -5420,13 +5429,13 @@ addLayer("hn", {
 				description: "<b>Prestige Boost</b>'s softcap is weaker based on your Hexes.",
 				multiRes: [
 					{
-						cost() { return new Decimal(player.ma.current=="hn"?"1e7025":25) },
+						cost() { return new Decimal(player.ma.current=="hn"?"1e7025":500) },
 					},
 					{
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e4.58e10":"1e4700000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e4.58e10":"1e4200000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 21) },
@@ -5459,13 +5468,13 @@ addLayer("hn", {
 				description: "<b>Reverse Prestige Boost</b> is stronger based on your Balance Energy.",
 				multiRes: [
 					{
-						cost() { return new Decimal(player.ma.current=="hn"?"1e12625":100) },
+						cost() { return new Decimal(player.ma.current=="hn"?"1e12625":500) },
 					},
 					{
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e6e11":"1e5400000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e6e11":"1e4250000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 23) },
@@ -5514,13 +5523,13 @@ addLayer("hn", {
 				description: "Point gain is raised to the power of 1.05.",
 				multiRes: [
 					{
-						cost() { return new Decimal(player.ma.current=="hn"?"1e12650":64) },
+						cost() { return new Decimal(player.ma.current=="hn"?"1e12650":800) },
 					},
 					{
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e6.06e11":"1e5600000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e6.06e11":"1e4444444") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 31) },
@@ -5530,13 +5539,13 @@ addLayer("hn", {
 				description: "<b>Upgrade Power</b> is raised ^7.",
 				multiRes: [
 					{
-						cost() { return new Decimal(player.ma.current=="hn"?"1e12800":1e4) },
+						cost() { return new Decimal(player.ma.current=="hn"?"1e12800":1e6) },
 					},
 					{
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e6.3e11":"1e10250000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e6.3e11":"e1000000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 32) },
@@ -5546,17 +5555,17 @@ addLayer("hn", {
 				description: "<b>Column Leader</b> is stronger based on your Best Honour.",
 				multiRes: [
 					{
-						cost() { return new Decimal(player.ma.current=="hn"?"1e12900":500) },
+						cost() { return new Decimal(player.ma.current=="hn"?"1e12900":2500) },
 					},
 					{
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e6.325e11":"1e6900000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e6.325e11":"1e5100000") },
 					},
 				],
 				unlocked() { return player.hn.unlocked && hasUpgrade("p", 33) },
-				effect() { return Decimal.pow(10, player.hn.best.plus(1).log10().plus(1).log10().sqrt()).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("hn"):false)?1.1:1) },
+				effect() { return Decimal.pow(10, player.hn.best.plus(1).log10().plus(1).log10().sqrt()).mul(1.25).times(((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("hn"):false)?1.1:1) },
 				effectDisplay() { return format(tmp.hn.upgrades[33].effect)+"x" },
 				formula: "10^sqrt(log(log(x+1)+1))",
 			},
@@ -5810,7 +5819,7 @@ addLayer("n", {
 				color: (player.oldStyle?"white":"rgba(255, 255, 255, 0.75)"),
 			},
 		}},
-        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?"1e288":"1e280") }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?"1e6969":"1e4222") }, // Can be a function that takes requirement increases into account
 		increaseUnlockOrder: ["hs"],
         resource: "nebula energy", // Name of prestige currency
         baseResource: "solarity", // Name of resource prestige is based on

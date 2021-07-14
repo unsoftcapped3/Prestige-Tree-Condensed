@@ -79,6 +79,7 @@ addLayer("condensers", {
         effect(){
           let e= player.p.points.add(1).log10().add(1).pow(player.condensers.buyables[12])
           if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
+          if(hasUpgrade("ba",34))e=e.pow(2)
           return e
         },
       unlocked(){return player.b.unlocked||player.g.unlocked}
@@ -113,6 +114,7 @@ addLayer("condensers", {
         effect(){
           let e= player.t.energy.add(1).log10().add(1).pow(player.condensers.buyables[21])
           if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
+          if(hasUpgrade("ba",34))e=e.pow(2)
           return e
         },
       unlocked(){return player.t.unlocked}
@@ -208,6 +210,11 @@ addLayer("a2", {
                 name: "Claim a role",
                 done() { return player.points.gte("e6969") },
                 tooltip: "Have e6969 points. Reward: Quirks multiply enhance point gain and all condensers are 1% stronger per achievement in this layer",
+            },
+          24: {
+                name: "eee",
+                done() { return player.ba.pos.gte(1e100)&&player.ba.neg.gte(1e100) },
+                tooltip: "Have e100 positivity and negativity. Reward: Phantom souls are cheaper.",
             },
 
 		},

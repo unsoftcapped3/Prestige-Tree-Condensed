@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.7",
+	num: "0.8",
 	patch: 0,
-	name: "Row 5",
+	name: "h",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -77,7 +77,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: e45 magic and balance energy"
+  "Endgame: around ee6 points and e6 honor"
 ]
 
 // Determines when the game "ends"

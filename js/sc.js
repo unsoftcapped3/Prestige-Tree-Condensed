@@ -31,6 +31,22 @@ const SOFTCAPS = {
 		display() { return player.q.energy.gte("1e1700") },
 		info() { return ("Starts at "+format(this.start)+", "+(hasMilestone("m",5)?"squar":"cub")+"e rooted") },
 	},
+  nebula: {
+		title: "Nebula Gain",
+		type: "root",
+		start: new Decimal("1e200"),
+		mag: new Decimal(4),
+		display() { return player.n.points.gte("1e200") },
+		info() { return "Starts at "+format(this.start)+", tesseract rooted" },
+	},
+  nebula2: {
+		title: "Nebula Gain",
+		type: "root",
+		start: new Decimal("1e3200"),
+		mag: new Decimal(4),
+		display() { return player.n.points.gte("1e3200") },
+		info() { return "Starts at "+format(this.start)+", tesseract rooted" },
+	},
 	normal_layers: {
 		title: "Non-Static Layer Gain",
 		type: "root",

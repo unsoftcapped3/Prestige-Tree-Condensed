@@ -2724,7 +2724,7 @@ addLayer("h", {
 		passiveGeneration() { return (hasMilestone("m", 2)&&player.ma.current!="h")?1:0 },
 		milestones: {
 			0: {
-				unlocked() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):false) },
+				unlocked() { return ((Array.isArray(tmp.ma.mastered))?tmp.ma.mastered.includes("h"):hasMilestone("h",0)) },
 				requirementDescription: "e300,000,000 Hindrance Spirit",
 				done() { return player.h.points.gte("e3e8") },
 				effectDescription: "Unlock the Repeatable Hindrance Automator.",
@@ -4190,6 +4190,7 @@ addLayer("m", {
         gainMult() { // Calculate the multiplier for main currency from bonuses
             mult = new Decimal(1);
 			if (hasAchievement("a", 74)) mult = mult.times(challengeEffect("h", 32));
+          mult=mult.mul(tmp.condensers.buyables[32].effect)
             return mult.times(tmp.n.realDustEffs2?tmp.n.realDustEffs2.purpleBlue:new Decimal(1));
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
@@ -4956,7 +4957,7 @@ addLayer("ps", {
 			let eff = player.ps.souls.plus(1).pow(layers.ps.soulEffExp());
 			return eff;
 		},
-		powerGain() { return player.ps.souls.plus(1).times(tmp.ps.buyables[21].effect).times(tmp.n.dustEffs.purple) },
+		powerGain() { return player.ps.souls.plus(1).times(tmp.ps.buyables[21].effect).times(tmp.n.dustEffs.purple).mul(tmp.condensers.buyables[31].effect) },
 		powerExp() { return player.ps.points.sqrt().times(tmp.ps.buyables[21].effect) },
 		tabFormat: {
 			"Main Tab": {
@@ -5063,6 +5064,7 @@ addLayer("ps", {
 				cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
                     let cost = Decimal.pow(10, Decimal.pow(2, x.div(this.scaleSlow()))).times(x.eq(0)?1e21:1e22);
 					if (hasUpgrade("hn", 51)) cost = cost.div(upgradeEffect("hn", 51));
+          if(cost.gte("e4000"))cost=cost.div("e500")
 					return cost;
                 },
 				effect() {
@@ -5729,7 +5731,7 @@ addLayer("hn", {
 						currencyDisplayName: "prestige points",
 						currencyInternalName: "points",
 						currencyLayer: "p",
-						cost() { return new Decimal(player.ma.current=="hn"?"e7.5e11":"e16000000") },
+						cost() { return new Decimal(player.ma.current=="hn"?"e7.5e11":"e15000000") },
 					},
 				],
 				unlocked() { return player.hn.upgrades.length>=16 && (player.n.unlocked||player.hs.unlocked) },
@@ -5819,7 +5821,7 @@ addLayer("n", {
 				color: (player.oldStyle?"white":"rgba(255, 255, 255, 0.75)"),
 			},
 		}},
-        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?"1e6969":"1e4222") }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?"1e2771":"1e2571") }, // Can be a function that takes requirement increases into account
 		increaseUnlockOrder: ["hs"],
         resource: "nebula energy", // Name of prestige currency
         baseResource: "solarity", // Name of resource prestige is based on
@@ -5839,7 +5841,7 @@ addLayer("n", {
         },
 		passiveGeneration() { return (hasMilestone("ma", 3)&&player.ma.current!="n")?1:0 },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new Decimal(1)
+            return new Decimal(0.5)
         },
         row: 5, // Row the layer is in on the tree (0 is the first row)
         hotkeys: [
@@ -5887,7 +5889,7 @@ addLayer("n", {
 				
 				(second?["column", [["clickable", 13], ["display-text", ("Multiply the Time Capsule limit base by <span style='color: #94de95; font-size: 24px'>"+format(tmp.n.dustEffs2.orangePurple)+"</span><br>"+(tmp.nerdMode?" (Effect Formula: (orange*purple+1)^0.6)":" (based on Orange & Purple Dust)"))]], {"background-color": "rgba(148, 222, 149, 0.25)", width: "50vw", padding: "10px", margin: "0 auto"}]:[]),
 			]],
-			"blank", "blank", ["buyable", 11], "blank", "blank",
+			"blank", "blank", ["row",[["buyable", 11],["buyable",12]]], "blank", "blank",
 		]},
 		dustGainMult() {
 			let mult = new Decimal(1);
@@ -5940,10 +5942,11 @@ addLayer("n", {
 			player.n.purpleDust = player.n.purpleDust.plus(tmp.n.effect.purple.times(diff));
 			player.n.blueDust = player.n.blueDust.plus(tmp.n.effect.blue.times(diff));
 			player.n.orangeDust = player.n.orangeDust.plus(tmp.n.effect.orange.times(diff));
+      if(hasMilestone("hn",9))player.n.unlockOrder=0
 		},
 		buyables: {
 			rows: 1,
-			cols: 1,
+			cols: 2,
 			11: {
 				title: "Stellar Clusters",
 				cap() { return new Decimal(5) },
@@ -5971,8 +5974,33 @@ addLayer("n", {
                     player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
                 },
                 buyMax() {
-					// later :)
 				},
+                style() { return {'height':'200px', 'width':'200px', color:(tmp[this.layer].buyables[this.id].canAfford?"white":"black")}},
+				autoed() { return false },
+			},
+      12: {
+				title: "More Condensers",
+				cap() { return new Decimal(1) },
+				cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
+					let cost = new Decimal(100).pow(x.add(1).pow(69))
+					return cost;
+                },
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id]
+                    let display = ((player[this.layer].buyables[this.id].gte(data.cap)?"MAXED":(("Cost: " + formatWhole(data.cost)+" Nebula Energy"+"\n\
+                    Amount: " + formatWhole(player[this.layer].buyables[this.id])+" / "+formatWhole(data.cap)+"\n\
+					Unlocked "+formatWhole(player[this.layer].buyables[this.id])+" new condenser"+(player[this.layer].buyables[this.id].eq(1)?"":"s")))))
+					return display;
+                },
+                unlocked() { return player[this.layer].unlocked }, 
+                canAfford() {
+					let cost = tmp[this.layer].buyables[this.id].cost
+                    return player.n.unlocked && player.n.points.gte(cost) && player[this.layer].buyables[this.id].lt(tmp[this.layer].buyables[this.id].cap)},
+                buy() { 
+                    cost = tmp[this.layer].buyables[this.id].cost
+					player.n.points=player.n.points.sub(cost)
+                    player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
+                },
                 style() { return {'height':'200px', 'width':'200px', color:(tmp[this.layer].buyables[this.id].canAfford?"white":"black")}},
 				autoed() { return false },
 			},
@@ -6039,14 +6067,14 @@ addLayer("hs", {
         }},
 		roundUpCost: true,
         color: "#dfdfff",
-        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?420:360) }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal((player[this.layer].unlockOrder>0&&!hasAchievement("a", 92))?626:302) }, // Can be a function that takes requirement increases into account
 		increaseUnlockOrder: ["n"],
         resource: "hyperspace energy", // Name of prestige currency 
         baseResource: "space energy", // Name of resource prestige is based on
         baseAmount() {return player.s.points}, // Get the current amount of baseResource
         type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
         exponent() { 
-			let exp = new Decimal(60);
+			let exp = new Decimal(30);
 			if (player.i.buyables[11].gte(4)) exp = exp.times(buyableEffect("s", 19));
 			return exp;
 		}, // Prestige currency exponent
@@ -6086,6 +6114,7 @@ addLayer("hs", {
 			["display-text", function() { return "You have "+formatWhole(player.ba.points)+" Balance Energy" }],
 			"blank",
 			["buyable", 11],
+                ["buyable", 12],
 			"blank", "blank",
 			"respec-button",
 			"blank",
@@ -6097,6 +6126,7 @@ addLayer("hs", {
 		update(diff) {
 			player.hs.buildLim = player.hs.buildLim.max(tmp.hs.buildLimit);
 			if (hasMilestone("ma", 5) && player.hs.auto && player.ma.current!="hs") tmp.hs.buyables[11].buyMax();
+      if(hasMilestone("hn",9))player.hs.unlockOrder=0
 		},
 		hyperspace() {
 			let total = player.hs.buyables[11];
@@ -6142,7 +6172,7 @@ addLayer("hs", {
                     x = x.times(tmp[this.layer].buyables[this.id].scaleRate);
 					let y = x;
 					if (y.gte(10)) y = y.pow(5).div(1e4);
-					let cost = {hs: Decimal.pow(10, y.pow(0.9)).floor(), ba: Decimal.pow(10, x.max(x.div(1.5).pow(2)).times(40).add(360))}
+					let cost = {hs: Decimal.pow(10, y.pow(0.9)).floor(), ba: Decimal.pow(10, x.max(x.div(1.5).pow(2)).times(40).add(player.hs.unlockOrder?1800:360))}
 					return cost;
                 },
 				display() { // Everything else displayed in the buyable button after the title
@@ -6171,6 +6201,30 @@ addLayer("hs", {
 				},
                 style() { return {'height':'200px', 'width':'200px'}},
 				autoed() { return hasMilestone("ma", 5) && player.hs.auto && player.ma.current!="hs" },
+			},
+      12: {
+				title: "Condenser",
+				cost(x=player[this.layer].buyables[this.id]) { 
+					let cost = new Decimal(4)
+					return cost;
+                },
+				display() { // Everything else displayed in the buyable button after the title
+                    let data = tmp[this.layer].buyables[this.id]
+                    let display = (player.hs.buyables[12].eq(1)?"MAXED":"Cost: " + formatWhole(data.cost) + " Hyperspace Energy")+"\n\nUnlocked "+formatWhole(player[this.layer].buyables[this.id])+" new condenser"+(player[this.layer].buyables[this.id].eq(1)?"":"s")
+					
+					return display;
+                },
+                unlocked() { return player[this.layer].unlocked }, 
+                canAfford() {
+					let cost = tmp[this.layer].buyables[this.id].cost
+                    return player.hs.unlocked && player.hs.points.gte(cost) && getBuyableAmount(this.layer,this.id).lt(1)
+				},
+                buy() { 
+                    cost = tmp[this.layer].buyables[this.id].cost
+					player.hs.points = player.hs.points.sub(cost)
+                    player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
+                },
+                style() { return {'height':'200px', 'width':'200px'}},
 			},
 			21: {
 				title: "Primary Hyper Building",
@@ -6479,7 +6533,7 @@ addLayer("i", {
 			first: 0,
         }},
         color: "#e5dab7",
-        requires() { return new Decimal("1e11750") }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal("1e78000") }, // Can be a function that takes requirement increases into account
         resource: "imperium bricks", // Name of prestige currency
         baseResource: "subspace", // Name of resource prestige is based on
         baseAmount() {return player.ss.subspace}, // Get the current amount of baseResource
@@ -6736,7 +6790,7 @@ addLayer("ma", {
 			current: null,
         }},
         color: "#ff9f7f",
-        requires() { return new Decimal(100) }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal(308) }, // Can be a function that takes requirement increases into account
         resource: "mastery", // Name of prestige currency
         baseResource: "phantom souls", // Name of resource prestige is based on
         baseAmount() {return player.ps.points}, // Get the current amount of baseResource

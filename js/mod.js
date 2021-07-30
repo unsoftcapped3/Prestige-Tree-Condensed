@@ -14,9 +14,9 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.8",
+	num: "0.9",
 	patch: 0,
-	name: "h",
+	name: "The Finished Row 6 Update",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -77,7 +77,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-  "Endgame: around ee6 points and e6 honor"
+  "Endgame: 308 phantom souls"
 ]
 
 // Determines when the game "ends"

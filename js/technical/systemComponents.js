@@ -145,6 +145,8 @@ var systemComponents = {
             Made by {{modInfo.author}}	
         </span>
         <br>
+        The Prestige Tree Rewritten by Jacorb
+        <br>
         The Modding Tree {{TMT_VERSION.tmtNum}} by Acamaeda
         <br>
         The Prestige Tree made by Jacorb and Aarex

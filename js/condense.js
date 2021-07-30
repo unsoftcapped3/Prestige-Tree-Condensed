@@ -27,6 +27,8 @@ addLayer("condensers", {
       let b21 = player.condensers.buyables[21]
        let b22 = player.condensers.buyables[22]
        let b23 = player.condensers.buyables[23]
+       let b31 = player.condensers.buyables[31]
+       let b32 = player.condensers.buyables[32]
 			if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
       if(hasMilestone("b",2))player.condensers.buyables[11] = b11
       if(hasUpgrade("b",12)||hasMilestone("s",1))player.condensers.buyables[12] = b12
@@ -34,6 +36,8 @@ addLayer("condensers", {
       if(layers[resettingLayer].row <= this.row+2||hasChallenge("h",22))player.condensers.buyables[21] = b21
       if(layers[resettingLayer].row <= this.row+3)player.condensers.buyables[22] = b22
       if(layers[resettingLayer].row <= this.row+3)player.condensers.buyables[23] = b23
+      if(layers[resettingLayer].row <= this.row+5)player.condensers.buyables[31] = b31
+      if(layers[resettingLayer].row <= this.row+5)player.condensers.buyables[32] = b32
 		},
 		startData() { return {
 			unlocked: true,
@@ -47,6 +51,8 @@ addLayer("condensers", {
       if(tmp.condensers.buyables[21].canAfford)setBuyableAmount("condensers",21,player.t.energy.div(1e6).max(0.5).log(7).root(1.7).floor().add(1))
       
     }
+    if(player.hs.buyables[12].gte(1)&&tmp.condensers.buyables[32].canAfford)setBuyableAmount("condensers",32,player.m.points.div("1e100").max(0.5).log(1000).root(2).floor().add(1))
+    if(player.n.buyables[12].gte(1)&&tmp.condensers.buyables[31].canAfford)setBuyableAmount("condensers",31,player.ps.power.div(1e50).max(0.5).log(1e10).root(1.75).floor().add(1))
     if(hasMilestone("m",2)&&tmp.condensers.buyables[23].canAfford)setBuyableAmount("condensers",23,player.o.energy.div(1e4).max(0.5).log(10).root(1.75).floor().add(1))
     if(hasMilestone("ba",1)&&tmp.condensers.buyables[22].canAfford)setBuyableAmount("condensers",22,player.q.points.div(25).max(0.5).log(2).root(1.6).floor().add(1))
   },
@@ -148,6 +154,41 @@ addLayer("condensers", {
           return e
         },
       unlocked(){return hasMilestone("o",1)}
+    },
+    31: {
+        cost() { 
+          let x = player.condensers.buyables[this.id]
+          if(x.gte(13))x=x.sub(12).pow(1.5).add(12)
+          return new Decimal(1e50).mul(Decimal.pow(1e10,x.pow(1.75))) },
+        display() { return "Condense your phantom power for "+format(this.cost())+" phantom power. Your "+player.condensers.buyables[this.id]+" condensers are multiplying phantom power gain by "+format(this.effect()) },
+        canAfford() { return player.ps.power.gte(this.cost()) },
+        buy() {
+            player.ps.power = player.ps.power.sub(this.cost())
+            setBuyableAmount(this.layer, this.id, player.condensers.buyables[this.id].add(1))
+        },
+        effect(){
+          let e= player.ps.power.add(1).log10().add(1).pow(player.condensers.buyables[this.id])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
+          return e
+        },
+      unlocked(){return player.n.buyables[12].gte(1)}
+    },
+    32: {
+        cost() { 
+          let x = player.condensers.buyables[this.id]
+          return new Decimal("1e100").mul(Decimal.pow(1000,x.pow(2))) },
+        display() { return "Condense your magic for "+format(this.cost())+" magic. Your "+player.condensers.buyables[this.id]+" condensers are multiplying magic gain by "+format(this.effect()) },
+        canAfford() { return player.m.points.gte(this.cost()) },
+        buy() {
+            player.m.points = player.m.points.sub(this.cost())
+            setBuyableAmount(this.layer, this.id, player.condensers.buyables[this.id].add(1))
+        },
+        effect(){
+          let e= player.m.points.add(1).log10().add(1).pow(player.condensers.buyables[this.id])
+          if(hasAchievement("a2",23))e=e.pow(Decimal.add(1,Decimal.div(player.a2.achievements.length,100)))
+          return e
+        },
+      unlocked(){return player.hs.buyables[12].gte(1)}
     },
   },tooltip:"Condensers",
 tabFormat: {

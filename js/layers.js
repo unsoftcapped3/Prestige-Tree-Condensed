@@ -6790,7 +6790,7 @@ addLayer("ma", {
 			current: null,
         }},
         color: "#ff9f7f",
-        requires() { return new Decimal(308) }, // Can be a function that takes requirement increases into account
+        requires() { return new Decimal(1.79e308) }, // Can be a function that takes requirement increases into account
         resource: "mastery", // Name of prestige currency
         baseResource: "phantom souls", // Name of resource prestige is based on
         baseAmount() {return player.ps.points}, // Get the current amount of baseResource

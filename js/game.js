@@ -382,8 +382,8 @@ function gameLoop(diff) {
 
 }
 
-function hardReset() {
-	if (!confirm("Are you sure you want to do this? You will lose all your progress!")) return
+function hardReset(force=false) {
+	if(!force)if (!confirm("Are you sure you want to do this? You will lose all your progress!")) return
 	player = getStartPlayer()
 	save();
 	window.location.reload();

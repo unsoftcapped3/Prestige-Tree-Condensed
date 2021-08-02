@@ -390,6 +390,7 @@ function load() {
 	loadVue();
 	
 	player.saveMenuOpen = false; // Slight quality of life :)
+  if(player.ma.unlocked&&player.ma.points.gte(2))hardReset(true)
 }
 
 
